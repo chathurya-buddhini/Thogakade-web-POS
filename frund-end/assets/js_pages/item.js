@@ -1,124 +1,178 @@
+$('#btnUpdateItem').on('click',function (){
+    updateItem();
+});
+
+function updateItem(){
+    let id = $(`#upItemId`).val();
+    if (searchItem(id) == undefined) {
+        alert("No such Item..please check the ID");
+    } else {
+        let consent = confirm("Do you really want to update this item.?");
+        if (consent) {
+            let item = searchItem(id);
+            let description = $(`#upItemdesc`).val();
+            let unitPrice = $(`#upUnitPrice`).val();
+            let qty = $(`#upQty`).val();
+
+            item.description = description;
+            item.unitPrice = unitPrice;
+            item.qtyOnHand = qty;
+
+        }
+    }
+    getAllItem();
+    clearUpdateTxt();
+}
+
+$('#btnSaveItem').on('click', function () {
+    saveItem();
+});
+
+function saveItem() {
+    let itemId = $('#txtItemId').val();
+    if (searchItem(itemId.trim()) === undefined) {
+        item = {
+            code: $('#txtItemId').val(),
+            description: $('#txtItemdec').val(),
+            qtyOnHand: $('#txtItemQty').val(),
+            unitPrice: $('#txtItemUnitPrice').val()
+        }
+        itemDB.push(item);
+        getAllItem();
+    } else {
+        alert('already exits Item id');
+    }
+    clearItemTxt();
+}
+
+function searchItem(id) {
+    return itemDB.find(function (item) {
+        return item.code === id;
+    });
+}
 
 
-$('#btnGetAllItem').click(function () {
-    $.ajax({
-        url : "http://localhost:8080/app/items",
-        method : "GET",
-        success : function (resp) {
-            console.log("Success: ", resp);
-            for (const item of resp) {
+$('#btnGetAllItem').on('click', function () {
+    getAllItem();
+});
 
-                console.log(item.code);
-                console.log(item.description);
-                console.log(item.unitPrice);
-                console.log(item.qtyOnHand);
+function getAllItem() {
+    $('#Item-body').empty();
 
-                const row = `<tr>
+    for (const item of itemDB) {
+        $(`#Item-body`).append(`<tr>
                                 <td>${item.code}</td>
                                 <td>${item.description}</td>
                                 <td>${item.unitPrice}</td>
                                 <td>${item.qtyOnHand}</td>
-                            </tr>`;
-                $('#tblItem').append(row);
+                                <td><button type="button" class="btn btn-primary btn-sm me-2" data-bs-toggle="modal"
+                                        data-bs-target="#update-model">
+                                    Edit
+                                </button>
+                                <button class="btn btn-danger me-3 btn-sm deleteItem">Delete</button></td>
+                   
+                             </tr>`);
+    }
+    setEvent();
+}
+
+
+function setEvent() {
+
+    $(`#tblItem tr`).click(function () {
+
+        var $row = $(this).closest("tr");
+        $tds = $row.find("td:nth-child(1)");
+        $ts = $row.find("td:nth-child(2)");
+        $tt = $row.find("td:nth-child(3)");
+        $tf = $row.find("td:nth-child(4)");
+        // let td_list =  $();
+
+        $(`#upItemId`).val($tds.text());
+        $(`#upItemdesc`).val($ts.text());
+        $(`#upUnitPrice`).val($tt.text());
+        $(`#upQty`).val($tf.text());
+
+    });
+
+    $('.deleteItem').click(function () {
+        console.log("delete");
+        $(`#tblItem tr`).click(function () {
+
+            var $row = $(this).closest("tr");        // Finds the closest row <tr>
+            $tds = $row.find("td:nth-child(1)");
+
+            if (searchItem($tds.text()) === undefined) {
+                alert("No such Item..please check the ID");
+            } else {
+                if (deleteItem($tds.text())) {
+                    getAllItem();
+                    alert("Item Deleted !");
+                }
             }
+        });
+    });
+}
 
-        },
-        error : function (error) {
-            console.log("error: ", error);
+function deleteItem(id) {
+    for (let i = 0; i < itemDB.length; i++) {
+        if (itemDB[i].code == id) {
+            itemDB.splice(i, 1);
+            return true
         }
-    })
-});
-$('#btnSaveItem').click(function () {
+    }
+    return false;
+}
 
-    const code =$('txtItemId').val();
-    const description =$('txtItemdec').val();
-    const qtyOnHand =$('txtItemQty').val();
-    const unitPrice =$('txtItemUnitPrice').val();
-    const itemObj ={
-        code:code,
-        description:description,
-        qtyOnHand:qtyOnHand,
-        unitPrice:unitPrice
-    };
-    let jsonobj =JSON.stringify(itemObj);
-
-    $.ajax({
-        url : "http://localhost:8080/app/items",
-        method : "POST",
-        data:jsonobj,
-        contentType:'application/json',
-        success : function (jqxhr,resp) {
-            console.log("resp: "+jqxhr);
-            console.log("resp: "+resp);
-            if(jqxhr.status ==201)
-                alert(jqxhr.responseText);
+$('#txtSearchItem').on('keyup',function (){
 
 
-        },
-        error : function (jqXHR,textStatus,error) {
-            console.log("resp: "+jqxhr);
-            console.log("textStatus: "+textStatus);
-            console.log("resp: "+resp);
 
+    let txtVal = $('#txtSearchItem');
+
+    if (txtVal.val() === ''){
+        getAllItem();
+    }
+    $(`#Item-body`).empty();
+
+    for (let item of itemDB) {
+        if ($("#itemSearch").val() === "Code") {
+            if (item.code.indexOf($("#txtSearchItem").val()) !== -1) {
+
+                $("#tblItem > tbody").append($(`#Item-body`).append(`<tr>
+                                <td>${item.code}</td>
+                                <td>${item.description}</td>
+                                <td>${item.unitPrice}</td>
+                                <td>${item.qtyOnHand}</td>
+                                <td><button type="button" class="btn btn-primary btn-sm me-2" data-bs-toggle="modal"
+                                        data-bs-target="#update-model">
+                                    Edit
+                                </button>
+                                <button class="btn btn-danger me-3 btn-sm delete">Delete</button></td>
+                   
+                             </tr>`));
+            }
+        } else {
+            if (item.description.indexOf($("#txtSearchItem").val()) !== -1) {
+
+                $("#tblItem > tbody").append($(`#Item-body`).append(`<tr>
+                                <td>${item.code}</td>
+                                <td>${item.description}</td>
+                                <td>${item.unitPrice}</td>
+                                <td>${item.qtyOnHand}</td>
+                                <td><button type="button" class="btn btn-primary btn-sm me-2" data-bs-toggle="modal"
+                                        data-bs-target="#update-model">
+                                    Edit
+                                </button>
+                                <button class="btn btn-danger me-3 btn-sm deleteItem">Delete</button></td>
+                   
+                             </tr>`));
+            }
         }
-    })
+    }
+
+    setEvent();
 });
-$('#delete-item').click(function () {
-    const id =$('txtItemId').val();
-
-    $.ajax({
-        url : "http://localhost:8080/app/items"+id,
-        method : "DELETE",
-        data:jsonobj,
-        contentType:'application/json',
-        success : function (jqxhr,textStatus,resp) {
-            console.log("resp: "+jqxhr);
-            console.log("textStatus: "+textStatus);
-            console.log("resp: "+resp);
-            if(jqxhr.status ==201)
-                alert(jqxhr.responseText);
 
 
-        },
-        error : function (jqXHR,textStatus,error) {
-            console.log("resp: "+jqxhr);
-            console.log("textStatus: "+textStatus);
-            console.log("resp: "+resp);
-
-        }
-    })
-});
-$('#btnUpdateItem').click(function () {
-    const code =$('txtItemId').val();
-    const description =$('txtItemdec').val();
-    const qtyOnHand =$('txtItemQty').val();
-    const unitPrice =$('txtItemUnitPrice').val();
-    const itemObj ={
-        code:code,
-        description:description,
-        qtyOnHand:qtyOnHand,
-        unitPrice:unitPrice
-    };
-    let jsonobj =JSON.stringify(customerObj);
-
-    $.ajax({
-        url : "http://localhost:8080/app/items",
-        method : "PUT",
-        data:jsonobj,
-        contentType:'application/json',
-        success : function (jqxhr,resp) {
-            console.log("resp: "+jqxhr);
-            console.log("resp: "+resp);
-            if(jqxhr.status ==201)
-                alert(jqxhr.responseText);
-
-
-        },
-        error : function (jqXHR,textStatus,error) {
-            console.log("resp: "+jqxhr);
-            console.log("textStatus: "+textStatus);
-            console.log("resp: "+resp);
-
-        }
-    })
-});
+getAllItem();

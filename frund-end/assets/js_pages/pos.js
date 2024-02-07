@@ -1,5 +1,14 @@
+let home = document.querySelector('#home');
+let cusbtn = document.querySelector('#cusbtn');
+let itbtn = document.querySelector('#itbtn');
+let odbtn = document.querySelector('#odbtn');
+let oddbtn = document.querySelector('#oddbtn');
 
-
+let cussec = document.querySelector('#cussec');
+let itsec = document.querySelector('#itsec');
+let odsec = document.querySelector('#odsec');
+let oddsec = document.querySelector('#oddsec');
+let dessec = document.querySelector('#dessec');
 
 cusbtn.addEventListener("click",function(){
   cussec.style.display = 'flex';
@@ -40,3 +49,31 @@ home.addEventListener("click",function(){
   odsec.style.display = 'none';
   oddsec.style.display = 'none';
 });
+
+let customer={
+id:"",
+name:"",
+address:"",
+tp:""
+}
+
+let item={
+code:"",
+description:"",
+qtyOnHand:0,
+unitPrice:0
+}
+
+let order = {
+oid:"",
+date:"",
+customerID:"",
+orderDetails:[]
+}
+
+let orderDetail = {
+oid: "",
+date: "",
+customerID: "",
+orderDetails: [/*{oid: this.oid, code: "", qty: 0, unitPrice: 0}*/]
+}
