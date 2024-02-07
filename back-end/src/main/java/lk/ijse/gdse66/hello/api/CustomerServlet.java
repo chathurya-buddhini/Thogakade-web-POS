@@ -1,13 +1,14 @@
 package lk.ijse.gdse66.hello.api;
 
-import jakarta.json.*;
 
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.annotation.*;
+import java.io.IOException;
+import java.sql.*;
+import java.util.ArrayList;
+
+import jakarta.json.*;
 import lk.ijse.gdse66.hello.bo.BoFactory;
 import lk.ijse.gdse66.hello.bo.custom.CustomerBo;
 import lk.ijse.gdse66.hello.dto.CustomerDTO;
@@ -18,7 +19,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
+
 
 @WebServlet(urlPatterns = "/customers")
 public class CustomerServlet extends HttpServlet {
