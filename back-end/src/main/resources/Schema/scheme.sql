@@ -1,6 +1,20 @@
 
 
 
+     CREATE TABLE OrderJoinEntity( orderID VARCHAR(8)NOT NULL,
+                                   orderDate DATE ,
+                                   cusId VARCHAR (8)NOT NULL,
+                                   ItemCode VARCHAR (8)NOT NULL,
+                                    qtyOnHand INT (10),
+                                    unitPrice DECIMAL (12.2),
+                        CONSTRAINT PRIMARY KEY (orderID,cusId,itemCode),
+                          CONSTRAINT FOREIGN KEY(ItemCode)REFERENCES item(code)on Delete Cascade on Update Cascade,
+                         CONSTRAINT FOREIGN KEY(cusId)REFERENCES customer(id)on Delete Cascade on Update Cascade,
+                         CONSTRAINT FOREIGN KEY(orderID)REFERENCES orders(orderID)on Delete Cascade on Update Cascade,
+                         CONSTRAINT FOREIGN KEY(qtyOnHand)REFERENCES item(qtyOnHand)on Delete Cascade on Update Cascade,
+                          CONSTRAINT FOREIGN KEY(unitPrice)REFERENCES item(unitPrice)on Delete Cascade on Update Cascade
+                         );
+
  CREATE TABLE customer( id VARCHAR(8)NOT NULL,
                         name VARCHAR (200),
                         address VARCHAR (200),

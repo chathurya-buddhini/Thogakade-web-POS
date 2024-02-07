@@ -1,10 +1,7 @@
 package lk.ijse.gdse66.hello.dao;
 
 
-import lk.ijse.gdse66.hello.dao.custom.impl.CustomerDaoImpl;
-import lk.ijse.gdse66.hello.dao.custom.impl.ItemDaoImpl;
-import lk.ijse.gdse66.hello.dao.custom.impl.OrderDaoImpl;
-import lk.ijse.gdse66.hello.dao.custom.impl.OrderDetailDaoImpl;
+import lk.ijse.gdse66.hello.dao.custom.impl.*;
 
 public class DAOFactory {
     private static DAOFactory daoFactory;
@@ -18,7 +15,7 @@ public class DAOFactory {
     }
 
     public enum DAOTypes {
-        CUSTOMER,ITEM,ORDER,ORDER_DETAILS
+        CUSTOMER,ITEM,ORDER,ORDER_DETAILS,QUERY
 
     }
 
@@ -32,8 +29,9 @@ public class DAOFactory {
                 return (T) new OrderDaoImpl();
             case ORDER_DETAILS:
                 return (T) new OrderDetailDaoImpl();
-//            case QUERY_DAO:
-//                return (T) new QueryDAOImpl();
+            case QUERY:
+                return (T) new QueryDaoImpl();
+
             default:
                 return null;
         }

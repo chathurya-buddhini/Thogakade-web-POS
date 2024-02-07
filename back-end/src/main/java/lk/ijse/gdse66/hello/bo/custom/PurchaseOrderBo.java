@@ -6,18 +6,13 @@ import lk.ijse.gdse66.hello.dto.CustomerDTO;
 import lk.ijse.gdse66.hello.dto.ItemDTO;
 import lk.ijse.gdse66.hello.dto.OrderDTO;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 public interface PurchaseOrderBo extends SuperBo {
+    boolean saveOrder(OrderDTO dto, DataSource source) throws SQLException, ClassNotFoundException;
 
-    public ArrayList<CustomerDTO> getAllCustomers() throws SQLException, ClassNotFoundException;
-
-    public ArrayList<ItemDTO> getAllItems() throws SQLException, ClassNotFoundException;
-
-    public boolean purchaseOrder(Connection connection, OrderDTO dto)throws SQLException, ClassNotFoundException;
-
-    public ArrayList<OrderDTO> getAllOrders(Connection connection) throws SQLException, ClassNotFoundException;
 
 }

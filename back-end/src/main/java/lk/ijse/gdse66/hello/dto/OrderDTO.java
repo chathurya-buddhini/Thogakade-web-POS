@@ -1,19 +1,27 @@
 package lk.ijse.gdse66.hello.dto;
 
+import javax.xml.crypto.Data;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 public class OrderDTO {
 
     private String orderID;
-    private String date;
+    private LocalDate date;
     private String customerID;
 
-    public OrderDTO(String orderID, String date, String customerID) {
-        this.orderID=orderID;
-        this.date= String.valueOf(date);
-        this.customerID=customerID;
+    public OrderDTO(String orderID, LocalDate date, String customerID, List<OrderDetailDTO> orderDetailsDTOList) {
+        this.orderID = orderID;
+        this.date = date;
+        this.customerID = customerID;
+        this.orderDetailsDTOList = orderDetailsDTOList;
     }
-
+    public OrderDTO(String orderID, LocalDate date, String customerID) {
+        this.orderID = orderID;
+        this.date = date;
+        this.customerID = customerID;
+    }
     public List<OrderDetailDTO> getOrderDetailsDTOList() {
         return orderDetailsDTOList;
     }
@@ -24,12 +32,6 @@ public class OrderDTO {
 
     List<OrderDetailDTO> orderDetailsDTOList;
 
-    public OrderDTO(String orderID, String date, String customerID , List orderDetailsDTOList) {
-        this.orderID = orderID;
-        this.date = date;
-        this.customerID = customerID;
-        this.orderDetailsDTOList=orderDetailsDTOList;
-    }
 
     public OrderDTO() {
     }
@@ -42,11 +44,11 @@ public class OrderDTO {
         this.orderID = orderID;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

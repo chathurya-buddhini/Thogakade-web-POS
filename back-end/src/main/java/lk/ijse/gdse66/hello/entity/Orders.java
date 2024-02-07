@@ -1,6 +1,7 @@
 package lk.ijse.gdse66.hello.entity;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 public class Orders {
 
@@ -14,7 +15,7 @@ public class Orders {
         this.customerID = customerID;
     }
 
-    public Orders(String string, Date date, String rstString) {
+    public Orders(String string, LocalDate date, String rstString) {
     }
 
     public String getOrderID() {

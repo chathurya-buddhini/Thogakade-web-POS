@@ -1,15 +1,17 @@
 package lk.ijse.gdse66.hello.dto;
 
 public class OrderDetailDTO {
-
-    private String itemCode;
     private String orderID;
+    private String itemCode;
     private int qty;
     private double unitPrice;
 
-    public OrderDetailDTO(String itemCode, String orderID, int qty, double unitPrice) {
-        this.itemCode = itemCode;
+    public OrderDetailDTO() {
+    }
+
+    public OrderDetailDTO(String orderID, String itemCode, int qty, double unitPrice) {
         this.orderID = orderID;
+        this.itemCode = itemCode;
         this.qty = qty;
         this.unitPrice = unitPrice;
     }
