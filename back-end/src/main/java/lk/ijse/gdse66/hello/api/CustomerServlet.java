@@ -1,14 +1,19 @@
 package lk.ijse.gdse66.hello.api;
 
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 
 import jakarta.json.*;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
 import lk.ijse.gdse66.hello.bo.BoFactory;
 import lk.ijse.gdse66.hello.bo.custom.CustomerBo;
 import lk.ijse.gdse66.hello.dto.CustomerDTO;
@@ -25,116 +30,104 @@ import java.sql.SQLException;
 @WebServlet(name = "customerServlet",urlPatterns = "/customers")
 public class CustomerServlet extends HttpServlet {
 
-    CustomerBo customerBO = (CustomerBo) BoFactory.getBoFactory().getBO(BoFactory.BOTypes.CUSTOMER);
+
+    CustomerBo customerBO= (CustomerBo) BoFactory.getBoFactory().getBO(BoFactory.BOTypes.CUSTOMER);
+
+    private DataSource source;
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void init() throws ServletException {
+        try {
+            InitialContext ic = new InitialContext();
+            source = (DataSource) ic.lookup("java:/comp/env/jdbc/pos");
 
-        resp.addHeader("Access-Control-Allow-Origin","*");
-        resp.setContentType("application/json");
-
-
-        ServletContext servletContext = getServletContext();
-        BasicDataSource pool = (BasicDataSource) servletContext.getAttribute("dbcp");
-
-
-        try (Connection connection = pool.getConnection()){
-            PrintWriter writer = resp.getWriter();
-
-            JsonArrayBuilder allCustomers = Json.createArrayBuilder();
-
-            ArrayList<CustomerDTO> all = customerBO.getAllCustomers(connection);
-
-            for (CustomerDTO customerDTO:all){
-                JsonObjectBuilder customer = Json.createObjectBuilder();
-
-                customer.add("id",customerDTO.getCusId());
-                customer.add("name",customerDTO.getCusName());
-                customer.add("address",customerDTO.getCusAddress());
-                customer.add("salary",customerDTO.getCusSalary());
-
-                allCustomers.add(customer.build());
-            }
-            writer.print(allCustomers.build());
-
-
-        } catch (ClassNotFoundException e) {
-            resp.getWriter().println(e.getMessage());
-        } catch (SQLException e) {
-            resp.getWriter().println(e.getMessage());
+        } catch (NamingException e) {
+            throw new RuntimeException(e);
         }
+    }
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            Connection connection = source.getConnection();
+            ArrayList<CustomerDTO> allCustomers = customerBO.getAllCustomers(connection);
+            resp.setContentType("application/json");
+            Jsonb jsonb = JsonbBuilder.create();
+            jsonb.toJson(allCustomers,resp.getWriter());
+        } catch (SQLException | ClassNotFoundException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Jsonb jsonb = JsonbBuilder.create();
+        CustomerDTO customerDTO = jsonb.fromJson(req.getReader(), CustomerDTO.class);
+        String id = customerDTO.getCusId();
+        String name = customerDTO.getCusName();
+        String address = customerDTO.getCusAddress();
+        double salary = customerDTO.getCusSalary();
 
 
-        resp.addHeader("Access-Control-Allow-Origin","*");
+        if(id==null || !id.matches("C\\d{3}")){
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID is empty or invalid");
+            return;
+        } else if (name == null || !name.matches("[A-Za-z ]+")) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Name is empty or invalid");
+            return;
+        } else if (address == null || address.length() < 3) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Address is empty or invalid");
+            return;
+        }else if (salary < 0.0 ){
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Salary is empty or invalid");
+            return;
+        }
 
+        try {
 
-        ServletContext servletContext = getServletContext();
-        BasicDataSource pool = (BasicDataSource) servletContext.getAttribute("dbcp");
+            Connection connection = source.getConnection();
+            boolean saveCustomer = customerBO.saveCustomer(new CustomerDTO(id,name,address,salary),connection);
+            if (saveCustomer) {
+                resp.setStatus(HttpServletResponse.SC_CREATED);
+                resp.getWriter().write("Added customer successfully");
+            }else {
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to save the customer");
+            }
 
-
-        String id = req.getParameter("id");
-        String name = req.getParameter("name");
-        String address = req.getParameter("address");
-        String salary = req.getParameter("salary");
-
-        System.out.printf("id=%s ,name=%s ,address=%s ,salary=%s\n" , id,name,address,salary);
-
-
-        try (Connection connection = pool.getConnection()){
-            PreparedStatement stn = connection.prepareStatement("INSERT INTO customer(id,name,address,salary) VALUES(?,?,?,?)");
-
-            stn.setString(1,id);
-            stn.setString(2,name);
-            stn.setString(3,address);
-            stn.setString(4,salary);
-
-            stn.executeUpdate();
-            resp.getWriter().write("print!!");
-
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+
 
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        JsonReader reader = Json.createReader(req.getReader());
-        JsonObject jsonObject = reader.readObject();
+        Jsonb jsonb = JsonbBuilder.create();
+        CustomerDTO customerDTO = jsonb.fromJson(req.getReader(), CustomerDTO.class);
+        String id = customerDTO.getCusId();
+        String name = customerDTO.getCusName();
+        String address = customerDTO.getCusAddress();
+        double salary = customerDTO.getCusSalary();
 
-        String id = jsonObject.getString("id");
-        String name = jsonObject.getString("name");
-        String address = jsonObject.getString("address");
-        Double salary = Double.valueOf(jsonObject.getString("salary"));
+        try {
 
-        resp.addHeader("Access-Control-Allow-Origin", "*");
-        resp.addHeader("Access-Control-Allow-Methods", "DELETE,PUT,GET");
-        resp.addHeader("Access-Control-Allow-Headers", "Content-Type");
+            Connection connection = source.getConnection();
 
-        ServletContext servletContext = getServletContext();
-        BasicDataSource pool = (BasicDataSource) servletContext.getAttribute("dbcp");
+            boolean updateCustomer = customerBO.updateCustomer(new CustomerDTO(id, name, address, salary),connection);
+            if (updateCustomer) {
+                resp.setStatus(HttpServletResponse.SC_CREATED);
+                resp.getWriter().write("Updated customer successfully");
+            }else {
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to update the customer");
+            }
 
-
-        System.out.printf("id=%s ,name=%s ,address=%s ,salary=%s \n" , id,name,address,salary);
-
-        try(Connection connection = pool.getConnection()) {
-            PreparedStatement stn = connection.prepareStatement("UPDATE customer SET name=?,address=?,salary=? WHERE id=?");
-
-
-            stn.setString(1,name);
-            stn.setString(2,address);
-            stn.setDouble(3,salary);
-            stn.setString(4,id);
-
-            stn.executeUpdate();
-            resp.getWriter().write("print!!");
-
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -142,36 +135,20 @@ public class CustomerServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        resp.addHeader("Access-Control-Allow-Origin", "*");
-        resp.addHeader("Access-Control-Allow-Methods", "DELETE,PUT,GET");
-        resp.addHeader("Access-Control-Allow-Headers", "Content-Type");
-
-        ServletContext servletContext = getServletContext();
-        BasicDataSource pool = (BasicDataSource) servletContext.getAttribute("dbcp");
-
         String id = req.getParameter("id");
 
-        try(Connection connection = pool.getConnection()) {
-            PreparedStatement stm = connection.prepareStatement("DELETE FROM customer WHERE id=?");
-
-            stm.setString(1,id);
-
-            if(stm.executeUpdate() != 0){
+        try {
+            Connection connection = source.getConnection();
+            boolean deleteCustomer = customerBO.deleteCustomer(id,connection);
+            if(deleteCustomer){
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }else{
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to delete the customer!");
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException | ClassNotFoundException throwables) {
+            throwables.printStackTrace();
         }
-    }
 
-    @Override
-    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.addHeader("Access-Control-Allow-Origin", "*");
-        resp.addHeader("Access-Control-Allow-Methods", "DELETE,PUT,GET");
-        resp.addHeader("Access-Control-Allow-Headers", "Content-Type");
     }
-
 
 }

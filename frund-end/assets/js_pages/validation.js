@@ -31,7 +31,6 @@ function clearUpdateFiald(){
 
 setBtn();
 
-//disable tab
 $("#customer-id,#customer-name,#customer-address,#customer-tp").on("keydown keyup", function (e) {
     //get the index number of data input fields indexNo
     let indexNo = c_vArray.indexOf(c_vArray.find((c) => c.field.attr("id") == e.target.id));
@@ -150,7 +149,7 @@ function setBtn() {
 
 const item_id_regx = /^(I00-)[0-9]{3}$/;
 const description_regx = /^[A-Za-z ]{5,}$/;
-const price_regex = /^[0-9 ]{2,}$/;
+const price_regex = /^[0-9]{2,}([.][0-9]{2})?$/;
 const qty_regex = /^[0-9 ]{2,}$/;
 
 let i_validity = [];
@@ -179,15 +178,14 @@ function clearUpdateTxt(){
 }
 
 $('#txtItemId,#txtItemdec,#txtItemUnitPrice,#txtItemQty').on("keydown keyup", function (e) {
-    //get the index number of data input fields indexNo
+
     let indexNo = i_validity.indexOf(i_validity.find((c) => c.field.attr("id") == e.target.id));
 
-    //Disable tab key
     if (e.key == "Tab") {
         e.preventDefault();
     }
 
-    //check validations
+
     checkValidations(i_validity[indexNo]);
 
     setItemBtn();
@@ -209,30 +207,29 @@ $('#txtItemId,#txtItemdec,#txtItemUnitPrice,#txtItemQty').on("keydown keyup", fu
 });
 
 $('#upItemId,#upItemdesc,#upUnitPrice,#upQty').on("keydown keyup", function (e) {
-    //get the index number of data input fields indexNo
+
     let indexNo = update_validity.indexOf(update_validity.find((c) => c.field.attr("id") == e.target.id));
 
-    //Disable tab key
+
     if (e.key == "Tab") {
         e.preventDefault();
     }
 
-    //check validations
+
     checkValidations(update_validity[indexNo]);
 
     setItemBtn();
 
-    //If the enter key pressed cheque and focus
     if (e.key == "Enter") {
 
         if (e.target.id != update_validity[update_validity.length - 1].field.attr("id")) {
-            //check validation is ok
+
             if (checkItemValidations(update_validity[indexNo])) {
                 update_validity[indexNo + 1].field.focus();
             }
         } else {
             if (checkItemValidations(update_validity[indexNo])) {
-                // saveCustomer();
+
             }
         }
     }
