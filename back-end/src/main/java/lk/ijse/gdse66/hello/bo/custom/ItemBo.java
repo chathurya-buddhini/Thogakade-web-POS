@@ -8,11 +8,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public interface ItemBo extends SuperBo {
-    public ArrayList<ItemDTO> getAllItems(Connection connection) throws SQLException, ClassNotFoundException;
+    ArrayList<ItemDTO> getAllItems(Connection connection) throws SQLException, ClassNotFoundException ;
 
-    public boolean saveItem(Connection connection, ItemDTO itemDTO) throws SQLException, ClassNotFoundException;
+    boolean deleteItem(String code ,Connection connection) throws SQLException, ClassNotFoundException ;
 
-    public boolean updateItem(Connection connection, ItemDTO itemDTO) throws SQLException, ClassNotFoundException;
-    public boolean deleteItem(Connection connection, String itemCode) throws SQLException, ClassNotFoundException;
+    boolean saveItem(ItemDTO dto,Connection connection) throws SQLException, ClassNotFoundException ;
+
+    boolean updateItem(ItemDTO dto,Connection connection) throws SQLException, ClassNotFoundException;
 
 }

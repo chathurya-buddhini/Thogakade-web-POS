@@ -13,27 +13,42 @@ import java.util.ArrayList;
 public class ItemDaoImpl implements ItemDao {
     @Override
     public ArrayList<Item> getAll(Connection connection) throws SQLException, ClassNotFoundException {
-        ArrayList<Item> allItems = new ArrayList<>();
         ResultSet rst = SQLUtil.execute(connection,"SELECT * FROM item");
+        ArrayList<Item> allItems = new ArrayList<>();
         while (rst.next()) {
-            Item item = new Item(rst.getString(1), rst.getString(2), rst.getDouble(3),  rst.getInt(4));
-            allItems.add(item);
+            allItems.add(new Item(rst.getString(1), rst.getString(2), rst.getDouble(3),rst.getInt(4)));
         }
         return allItems;
     }
 
     @Override
-    public boolean save(Connection connection, Item entity) throws SQLException, ClassNotFoundException {
-        return SQLUtil.execute(connection, "INSERT INTO item VALUES (?,?,?,?)", entity.getItemCode(), entity.getItemName(), entity.getItemPrice(), entity.getItemQty());
+    public boolean save(Item entity,Connection connection) throws SQLException, ClassNotFoundException {
+        return SQLUtil.execute(connection,"INSERT INTO item (code, description, unitPrice, qtyOnHand) VALUES (?,?,?,?)", entity.getItemCode(), entity.getItemName(), entity.getItemPrice(), entity.getItemQty());
+
     }
 
     @Override
-    public boolean update(Connection connection, Item entity) throws SQLException, ClassNotFoundException {
-        return SQLUtil.execute(connection, "UPDATE item SET item_name=?, unit_price=?, qty_on_hnd=? WHERE item_ID=?",entity.getItemName() , entity.getItemPrice(), entity.getItemQty(), entity.getItemCode());
+    public boolean update(Item entity,Connection connection) throws SQLException, ClassNotFoundException {
+        return SQLUtil.execute(connection,"UPDATE item SET description=?, unitPrice=?, qtyOnHand=? WHERE code=?", entity.getItemName(), entity.getItemPrice(), entity.getItemQty(), entity.getItemCode());
     }
 
     @Override
-    public boolean delete(Connection connection, String Id) throws SQLException, ClassNotFoundException {
-        return SQLUtil.execute(connection, "DELETE FROM item WHERE item_ID=?", Id);
+    public boolean delete(String code,Connection connection) throws SQLException, ClassNotFoundException {
+        return SQLUtil.execute(connection,"DELETE FROM item WHERE code=?", code);
     }
+
+    @Override
+    public boolean exist(String s, Connection connection) throws SQLException, ClassNotFoundException {
+        return false;
+    }
+
+    @Override
+    public Item search(String code, Connection connection) throws SQLException, ClassNotFoundException {
+        ResultSet rst = SQLUtil.execute(connection,"SELECT * FROM item WHERE code=?", code);
+        if (rst.next()) {
+            return new Item(rst.getString(1), rst.getString(2),  rst.getDouble(3),rst.getInt(4));
+        }
+        return null;
+    }
+
 }

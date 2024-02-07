@@ -2,17 +2,22 @@ package lk.ijse.gdse66.hello.api;
 
 import jakarta.json.*;
 
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
 import lk.ijse.gdse66.hello.bo.BoFactory;
 import lk.ijse.gdse66.hello.bo.custom.ItemBo;
 import lk.ijse.gdse66.hello.dto.ItemDTO;
 import org.apache.commons.dbcp2.BasicDataSource;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -26,148 +31,113 @@ public class ItemServlet extends HttpServlet {
 
     ItemBo itemBO = (ItemBo) BoFactory.getBoFactory().getBO(BoFactory.BOTypes.ITEM);
 
+    private DataSource source;
+
+    @Override
+    public void init() throws ServletException {
+        try {
+            InitialContext ic = new InitialContext();
+            source = (DataSource) ic.lookup("java:/comp/env/jdbc/pos");
+
+        } catch (NamingException e) {
+            throw new RuntimeException(e);
+        }
+    }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        resp.addHeader("Access-Control-Allow-Origin","*");
-        resp.setContentType("application/json");
-
-
-        ServletContext servletContext = getServletContext();
-        BasicDataSource pool = (BasicDataSource) servletContext.getAttribute("dbcp");
-
-
-        try (Connection connection = pool.getConnection()){
-            PrintWriter writer = resp.getWriter();
-
-            JsonArrayBuilder allItems = Json.createArrayBuilder();
-
-            ArrayList<ItemDTO> all = itemBO.getAllItems(connection);
-
-            for (ItemDTO itemDTO:all){
-                JsonObjectBuilder item = Json.createObjectBuilder();
-
-                item.add("code",itemDTO.getItemCode());
-                item.add("name",itemDTO.getItemName());
-                item.add("qty",itemDTO.getItemQty());
-                item.add("price",itemDTO.getItemPrice());
-
-                allItems.add(item.build());
-            }
-
-            writer.print(allItems.build());
-
-
-        } catch (ClassNotFoundException e) {
-            resp.getWriter().println(e.getMessage());
-        } catch (SQLException e) {
-            resp.getWriter().println(e.getMessage());
+        try {
+            ArrayList<ItemDTO> allitems = itemBO.getAllItems(source.getConnection());
+            resp.setContentType("application/json");
+            Jsonb jsonb = JsonbBuilder.create();
+            jsonb.toJson(allitems,resp.getWriter());
+        } catch (SQLException | ClassNotFoundException throwables) {
+            throwables.printStackTrace();
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        resp.addHeader("Access-Control-Allow-Origin","*");
+        Jsonb jsonb = JsonbBuilder.create();
+        ItemDTO itemDTO = jsonb.fromJson(req.getReader(), ItemDTO.class);
+        String code = itemDTO.getItemCode();
+        String description = itemDTO.getItemName();
+        double unitPrice = itemDTO.getItemQty();
+        int qty = itemDTO.getItemQty();
 
-        ServletContext servletContext = getServletContext();
-        BasicDataSource pool = (BasicDataSource) servletContext.getAttribute("dbcp");
 
-        String code = req.getParameter("code");
-        String name = req.getParameter("name");
-        Double price = Double.valueOf(req.getParameter("price"));
-        int qty = Integer.parseInt(req.getParameter("qty"));
+        if(code==null || !code.matches("I\\d{3}")){
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Item Code is empty or invalid");
+            return;
+        } else if (description == null || !description.matches("[A-Za-z ]+")) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Description is empty or invalid");
+            return;
+        } else if (unitPrice < 0.0) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unit Price is empty or invalid");
+            return;
+        }else if (qty < 0 ){
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Quantity is empty or invalid");
+            return;
+        }
 
-        System.out.printf("code=%s ,name=%s ,price=%s ,qty=%s\n" , code,name,price,qty);
+        try {
 
-        try (Connection connection = pool.getConnection()){
-            PreparedStatement stn = connection.prepareStatement("INSERT INTO item(code,description,unitPrice,qtyOnHand) VALUES(?,?,?,?)");
+            boolean saveItem = itemBO.saveItem(new ItemDTO(code,description,unitPrice,qty), source.getConnection());
+            if (saveItem) {
+                resp.setStatus(HttpServletResponse.SC_CREATED);
+                resp.getWriter().write("Added item successfully");
+            }else {
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to save the item");
+            }
 
-            stn.setString(1,code);
-            stn.setString(2,name);
-            stn.setDouble(3,price);
-            stn.setInt(4,qty);
-
-            stn.executeUpdate();
-            resp.getWriter().write("print!!");
-
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Jsonb jsonb = JsonbBuilder.create();
+        ItemDTO itemDTO = jsonb.fromJson(req.getReader(), ItemDTO.class);
+        String code = itemDTO.getItemCode();
+        String description = itemDTO.getItemName();
+        double unitPrice = itemDTO.getItemPrice();
+        int qty = itemDTO.getItemQty();
 
+        try {
 
-        JsonReader reader = Json.createReader(req.getReader());
-        JsonObject jsonObject = reader.readObject();
+            boolean updateItem = itemBO.updateItem(new ItemDTO(code,description,unitPrice,qty), source.getConnection());
+            if (updateItem) {
+                resp.setStatus(HttpServletResponse.SC_CREATED);
+                resp.getWriter().write("Updated item successfully");
+            }else {
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to update the item");
+            }
 
-        String code = jsonObject.getString("code");
-        String name = jsonObject.getString("name");
-        Double price = Double.valueOf(jsonObject.getString("price"));
-        int qty = Integer.parseInt(jsonObject.getString("qty"));
-
-
-        resp.addHeader("Access-Control-Allow-Origin", "*");
-        resp.addHeader("Access-Control-Allow-Methods", "DELETE,PUT,GET");
-        resp.addHeader("Access-Control-Allow-Headers", "Content-Type");
-
-        ServletContext servletContext = getServletContext();
-        BasicDataSource pool = (BasicDataSource) servletContext.getAttribute("dbcp");
-
-
-        System.out.printf("code=%s ,name=%s ,price=%s ,qty=%s\n" , code,name,price,qty);
-
-        try(Connection connection = pool.getConnection()) {
-            PreparedStatement stn = connection.prepareStatement("UPDATE item SET description=?,unitPrice=?,qtyOnHand=? WHERE code=?");
-
-
-            stn.setString(1,name);
-            stn.setDouble(2,price);
-            stn.setInt(3,qty);
-            stn.setString(4,code);
-
-            stn.executeUpdate();
-            resp.getWriter().write("print!!");
-
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String id = req.getParameter("id");
 
-        resp.addHeader("Access-Control-Allow-Origin", "*");
-        resp.addHeader("Access-Control-Allow-Methods", "DELETE,PUT,GET");
-        resp.addHeader("Access-Control-Allow-Headers", "Content-Type");
-
-        ServletContext servletContext = getServletContext();
-        BasicDataSource pool = (BasicDataSource) servletContext.getAttribute("dbcp");
-
-
-        String code = req.getParameter("code");
-
-        try(Connection connection = pool.getConnection()) {
-            PreparedStatement stm = connection.prepareStatement("DELETE FROM item WHERE code=?");
-
-            stm.setString(1,code);
-
-            if(stm.executeUpdate() != 0){
+        try {
+            boolean deleteItem = itemBO.deleteItem(id, source.getConnection());
+            if (deleteItem) {
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-            }else{
-                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to delete the customer!");
+            } else {
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to delete the item!");
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException | ClassNotFoundException throwables) {
+            throwables.printStackTrace();
         }
     }
 
-    @Override
-    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.addHeader("Access-Control-Allow-Origin", "*");
-        resp.addHeader("Access-Control-Allow-Methods", "DELETE,PUT,GET");
-        resp.addHeader("Access-Control-Allow-Headers", "Content-Type");
     }
-}

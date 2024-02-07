@@ -13,30 +13,31 @@ import java.util.ArrayList;
 
 public class ItemBoImpl implements ItemBo {
 
-    ItemDao itemDAO = (ItemDao) DAOFactory.getDAOFactory().getDAO(DAOFactory.DAOTypes.ITEM);
+    ItemDao itemDAO = DAOFactory.getDAOFactory().getDAO(DAOFactory.DAOTypes.ITEM);
+
 
     @Override
     public ArrayList<ItemDTO> getAllItems(Connection connection) throws SQLException, ClassNotFoundException {
-        ArrayList<ItemDTO> allItems= new ArrayList<>();
+        ArrayList<ItemDTO> list = new ArrayList<>();
         ArrayList<Item> all = itemDAO.getAll(connection);
-        for (Item c : all) {
-            allItems.add(new ItemDTO(c.getItemCode(),c.getItemName(),c.getItemPrice(),c.getItemQty()));
+        for (Item i : all) {
+            list.add(new ItemDTO(i.getItemCode(), i.getItemName(), i.getItemPrice(), i.getItemQty()));
         }
-        return allItems;
+        return list;
     }
 
     @Override
-    public boolean saveItem(Connection connection, ItemDTO itemDTO) throws SQLException, ClassNotFoundException {
-        return itemDAO.save(connection,new Item(itemDTO.getItemCode(),itemDTO.getItemName(),itemDTO.getItemPrice(),itemDTO.getItemQty()));
+    public boolean deleteItem(String code,Connection connection) throws SQLException, ClassNotFoundException {
+        return itemDAO.delete(code,connection);    }
+
+    @Override
+    public boolean saveItem(ItemDTO dto,Connection connection) throws SQLException, ClassNotFoundException {
+        return itemDAO.save(new Item(dto.getItemCode(), dto.getItemName(), dto.getItemPrice(), dto.getItemQty()),connection);
     }
 
     @Override
-    public boolean updateItem(Connection connection, ItemDTO itemDTO) throws SQLException, ClassNotFoundException {
-        return itemDAO.update(connection,new Item(itemDTO.getItemCode(),itemDTO.getItemName(),itemDTO.getItemPrice(),itemDTO.getItemQty()));
+    public boolean updateItem(ItemDTO dto,Connection connection) throws SQLException, ClassNotFoundException {
+        return itemDAO.update(new Item(dto.getItemCode(), dto.getItemName(), dto.getItemPrice(), dto.getItemQty()),connection);
     }
 
-    @Override
-    public boolean deleteItem(Connection connection, String itemCode) throws SQLException, ClassNotFoundException {
-        return itemDAO.delete(connection,itemCode);
-    }
 }
