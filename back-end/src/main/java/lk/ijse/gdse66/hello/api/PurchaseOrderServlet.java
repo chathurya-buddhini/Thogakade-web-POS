@@ -11,7 +11,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
 
-@WebServlet(urlPatterns = "/orders")
+//@WebServlet(urlPatterns = "/orders")
+@WebServlet(name = "purchaseOrderServlet",urlPatterns = "/orders")
 public class PurchaseOrderServlet extends HttpServlet {
 
     @Override

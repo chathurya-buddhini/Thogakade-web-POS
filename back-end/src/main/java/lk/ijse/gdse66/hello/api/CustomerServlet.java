@@ -21,7 +21,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 
-@WebServlet(urlPatterns = "/customers")
+//@WebServlet(urlPatterns = "/customers")
+@WebServlet(name = "customerServlet",urlPatterns = "/customers")
 public class CustomerServlet extends HttpServlet {
 
     CustomerBo customerBO = (CustomerBo) BoFactory.getBoFactory().getBO(BoFactory.BOTypes.CUSTOMER);
