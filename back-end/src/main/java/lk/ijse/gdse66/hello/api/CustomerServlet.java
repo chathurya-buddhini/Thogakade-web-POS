@@ -31,8 +31,7 @@ import java.sql.SQLException;
 public class CustomerServlet extends HttpServlet {
 
 
-    CustomerBo customerBO= (CustomerBo) BoFactory.getBoFactory().getBO(BoFactory.BOTypes.CUSTOMER);
-
+    CustomerBo customerBO= BoFactory.getBoFactory().getBO(BoFactory.BOTypes.CUSTOMER);
     private DataSource source;
 
     @Override
@@ -82,7 +81,8 @@ public class CustomerServlet extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Salary is empty or invalid");
             return;
         }
-
+        System.out.printf("id=%s, name=%s, address=%s,salary=%s \n", id,name,address,salary);
+System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaa");
         try {
 
             Connection connection = source.getConnection();
@@ -150,5 +150,6 @@ public class CustomerServlet extends HttpServlet {
         }
 
     }
+
 
 }

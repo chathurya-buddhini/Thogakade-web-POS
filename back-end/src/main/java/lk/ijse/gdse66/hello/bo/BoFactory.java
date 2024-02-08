@@ -8,31 +8,31 @@ import lk.ijse.gdse66.hello.bo.custom.impl.PurchaseOrderBoImpl;
 
 public class BoFactory {
     private static BoFactory boFactory;
-    private BoFactory(){
-    }
-    public static BoFactory getBoFactory(){
 
-        return (boFactory==null)? boFactory=new BoFactory() : boFactory;
+    private BoFactory() {
+
     }
 
-    public enum BOTypes{
-        CUSTOMER,ITEM,PURCHASE_ORDER,Detail_BO
+    public static BoFactory getBoFactory() {
+        return (boFactory == null) ? boFactory = new BoFactory() : boFactory;
     }
 
-    //Object creation logic for BO objects
-    public SuperBo getBO(BOTypes types){
-        switch (types){
+    public enum BOTypes {
+        CUSTOMER, ITEM, PURCHASE_ORDER,Detail_BO
+    }
+
+    public <T extends SuperBo> T getBO(BOTypes boTypes) {
+        switch (boTypes) {
             case CUSTOMER:
-                return new CustomerBoImpl();
+                return (T) new CustomerBoImpl();
             case ITEM:
-                return new ItemBoImpl();
+                return (T) new ItemBoImpl();
             case PURCHASE_ORDER:
-                return new PurchaseOrderBoImpl();
+                return (T) new PurchaseOrderBoImpl();
             case Detail_BO:
-                return  new OrderDetailBoImpl();
+                return (T) new OrderDetailBoImpl();
             default:
                 return null;
         }
     }
-
 }

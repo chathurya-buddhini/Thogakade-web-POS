@@ -14,7 +14,7 @@ public class QueryDaoImpl implements QueryDao {
     @Override
     public ArrayList<OrderJoinEntity> searchOrderByOID(String oid, Connection connection) throws SQLException, ClassNotFoundException {
         ArrayList<OrderJoinEntity> allRecords = new ArrayList<>();
-        String sql = "select orders.id,Orders.date,Orders.customerID,order_detail.orderId,order_detail.itemCode,order_detail.qty,order_detail.unitPrice from orders inner join order_detail on Orders.oid=OrderDetails.oid where Orders.oid=?";
+        String sql = "select orders.orderID,orders.date,orders.cusId,orderDetail.orderID,orderDetail.ItemCode,orderDetail.qtyOnHand,orderDetail.unitPrice from orders inner join orderDetail on orders.oid=OrderDetails.oid where orders.oid=?";
         ResultSet rst = SQLUtil.execute(connection,sql, oid);
         while (rst.next()) {
             String orderID = rst.getString(1);

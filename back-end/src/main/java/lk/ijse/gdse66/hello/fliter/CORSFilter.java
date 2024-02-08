@@ -8,6 +8,7 @@ import javax.servlet.http.HttpFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
 @WebFilter(filterName = "CORESFilter", urlPatterns = "/*")
 public class CORSFilter extends HttpFilter {
     @Override

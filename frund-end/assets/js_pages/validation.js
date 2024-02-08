@@ -32,15 +32,14 @@ function clearUpdateFiald(){
 setBtn();
 
 $("#customer-id,#customer-name,#customer-address,#customer-tp").on("keydown keyup", function (e) {
-    //get the index number of data input fields indexNo
+
     let indexNo = c_vArray.indexOf(c_vArray.find((c) => c.field.attr("id") == e.target.id));
 
-    //Disable tab key
     if (e.key == "Tab") {
         e.preventDefault();
     }
 
-    //check validations
+
     checkValidations(c_vArray[indexNo]);
 
     setBtn();
@@ -63,20 +62,17 @@ $("#customer-id,#customer-name,#customer-address,#customer-tp").on("keydown keyu
 
 
 $("#upCID,#upCName,#upCAddress,#upCTp").on("keydown keyup", function (e) {
-    //get the index number of data input fields indexNo
+
     let indexNo = u_vArray.indexOf(u_vArray.find((c) => c.field.attr("id") == e.target.id));
 
-    //Disable tab key
     if (e.key == "Tab") {
         e.preventDefault();
     }
 
-    //check validations
     checkValidations(u_vArray[indexNo]);
 
     setBtn();
 
-    //If the enter key pressed cheque and focus
     if (e.key == "Enter") {
 
         if (e.target.id != u_vArray[u_vArray.length - 1].field.attr("id")) {
@@ -86,7 +82,7 @@ $("#upCID,#upCName,#upCAddress,#upCTp").on("keydown keyup", function (e) {
             }
         } else {
             if (checkValidations(u_vArray[indexNo])) {
-                // saveCustomer();
+
             }
         }
     }
@@ -127,8 +123,6 @@ function checkAll() {
 }
 
 function setBtn() {
-    // $(".delete").prop("disabled", true);
-    // $("#save-customer").prop("disabled", true);
 
     if (checkAll()) {
         $("#save-customer").prop("disabled", false);
@@ -138,15 +132,15 @@ function setBtn() {
 
     let id = $("#upCID").val();
     if (searchCustomer(id) == undefined) {
-        // $("#btnCusDelete").prop("disabled", true);
+
         $("#updateCustomer").prop("disabled", true);
     } else {
-        // $(".delete").prop("disabled", false);
+
         $("#updateCustomer").prop("disabled", false);
     }
 
 }
-
+////////////////////////////////item//////////////////////////////////////////////////
 const item_id_regx = /^(I00-)[0-9]{3}$/;
 const description_regx = /^[A-Za-z ]{5,}$/;
 const price_regex = /^[0-9]{2,}([.][0-9]{2})?$/;
@@ -190,7 +184,6 @@ $('#txtItemId,#txtItemdec,#txtItemUnitPrice,#txtItemQty').on("keydown keyup", fu
 
     setItemBtn();
 
-    //If the enter key pressed cheque and focus
     if (e.key == "Enter") {
 
         if (e.target.id != i_validity[i_validity.length - 1].field.attr("id")) {
@@ -200,7 +193,7 @@ $('#txtItemId,#txtItemdec,#txtItemUnitPrice,#txtItemQty').on("keydown keyup", fu
             }
         } else {
             if (checkItemValidations(i_validity[indexNo])) {
-                // saveCustomer();
+
             }
         }
     }

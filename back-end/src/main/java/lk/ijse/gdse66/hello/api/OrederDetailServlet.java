@@ -3,6 +3,7 @@ package lk.ijse.gdse66.hello.api;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import lk.ijse.gdse66.hello.bo.BoFactory;
+import lk.ijse.gdse66.hello.bo.custom.ItemBo;
 import lk.ijse.gdse66.hello.bo.custom.OrderDetailBo;
 import lk.ijse.gdse66.hello.dto.OrderDetailDTO;
 
@@ -20,10 +21,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 @WebServlet(urlPatterns = "/detail")
+//@WebServlet(name = "orederDetailServlet",urlPatterns = "/detail")
 public class OrederDetailServlet extends HttpServlet {
 
-    OrderDetailBo detailBO = (OrderDetailBo) BoFactory.getBoFactory().getBO(BoFactory.BOTypes.Detail_BO);
-
+    OrderDetailBo detailBO= BoFactory.getBoFactory().getBO(BoFactory.BOTypes.Detail_BO);
     private DataSource source;
 
     @Override
@@ -47,4 +48,5 @@ public class OrederDetailServlet extends HttpServlet {
             throwables.printStackTrace();
         }
     }
+
 }

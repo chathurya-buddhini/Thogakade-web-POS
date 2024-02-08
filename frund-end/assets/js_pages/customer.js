@@ -41,7 +41,7 @@ function updateCustomer() {
         let consent = confirm("Do you really want to update this customer.?");
         if (consent) {
             let customer = searchCustomer(id);
-            //if the customer available can we update.?
+
             let name = $(`#upCName`).val();
             let address = $(`#upCAddress`).val();
             let tp = $(`#upCTp`).val();
@@ -105,7 +105,7 @@ function setEvent() {
     $('.delete').click(function () {
         $(`#tblCustomer tr`).click(function () {
 
-            var $row = $(this).closest("tr");        // Finds the closest row <tr>
+            var $row = $(this).closest("tr");
             $tds = $row.find("td:nth-child(1)");
 
             if (searchCustomer($tds.text()) === undefined) {
@@ -126,7 +126,7 @@ function setEvent() {
 $('.delete').click(function () {
     $(`#tblCustomer tr`).click(function () {
 
-        var $row = $(this).closest("tr");        // Finds the closest row <tr>
+        var $row = $(this).closest("tr");
         $tds = $row.find("td:nth-child(1)");
 
         if (searchCustomer($tds.text()) === undefined) {
@@ -153,12 +153,12 @@ function deleteFunc(id){
 
 $(`#tblCustomer tr`).click(function () {
 
-    var $row = $(this).closest("tr");        // Finds the closest row <tr>
+    var $row = $(this).closest("tr");
     $tds = $row.find("td:nth-child(1)");
     $ts = $row.find("td:nth-child(2)");
     $tt = $row.find("td:nth-child(3)");
     $tf = $row.find("td:nth-child(4)");
-    // let td_list =  $();
+
 
     $(`#upCID`).val($tds.text());
     $(`#upCName`).val($ts.text());

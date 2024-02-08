@@ -99,7 +99,7 @@ function setEvent() {
         console.log("delete");
         $(`#tblItem tr`).click(function () {
 
-            var $row = $(this).closest("tr");        // Finds the closest row <tr>
+            var $row = $(this).closest("tr");
             $tds = $row.find("td:nth-child(1)");
 
             if (searchItem($tds.text()) === undefined) {

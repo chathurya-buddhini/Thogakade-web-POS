@@ -4,6 +4,7 @@ import jakarta.json.*;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import lk.ijse.gdse66.hello.bo.BoFactory;
+import lk.ijse.gdse66.hello.bo.custom.OrderDetailBo;
 import lk.ijse.gdse66.hello.bo.custom.PurchaseOrderBo;
 import lk.ijse.gdse66.hello.dto.OrderDTO;
 import lk.ijse.gdse66.hello.dto.OrderDetailDTO;
@@ -25,8 +26,8 @@ import java.util.List;
 @WebServlet(urlPatterns = "/orders")
 //@WebServlet(name = "purchaseOrderServlet",urlPatterns = "/orders")
 public class PurchaseOrderServlet extends HttpServlet {
-    PurchaseOrderBo purchaseOrderBo = (PurchaseOrderBo) BoFactory.getBoFactory().getBO(BoFactory.BOTypes.PURCHASE_ORDER);
 
+    PurchaseOrderBo purchaseOrderBo= BoFactory.getBoFactory().getBO(BoFactory.BOTypes.PURCHASE_ORDER);
     private DataSource source;
 
     @Override
@@ -80,6 +81,7 @@ public class PurchaseOrderServlet extends HttpServlet {
             e.printStackTrace();
         }
     }
-    }
+
+}
 
 

@@ -5,6 +5,7 @@ import jakarta.json.*;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import lk.ijse.gdse66.hello.bo.BoFactory;
+import lk.ijse.gdse66.hello.bo.custom.CustomerBo;
 import lk.ijse.gdse66.hello.bo.custom.ItemBo;
 import lk.ijse.gdse66.hello.dto.ItemDTO;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -29,8 +30,7 @@ import java.util.ArrayList;
 //@WebServlet(name = "itemServlet",urlPatterns = "/items")
 public class ItemServlet extends HttpServlet {
 
-    ItemBo itemBO = (ItemBo) BoFactory.getBoFactory().getBO(BoFactory.BOTypes.ITEM);
-
+    ItemBo itemBO= BoFactory.getBoFactory().getBO(BoFactory.BOTypes.ITEM);
     private DataSource source;
 
     @Override
