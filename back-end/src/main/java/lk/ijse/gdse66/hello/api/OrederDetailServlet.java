@@ -20,8 +20,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-@WebServlet(urlPatterns = "/detail")
-//@WebServlet(name = "orederDetailServlet",urlPatterns = "/detail")
+//@WebServlet(urlPatterns = "/detail")
+  @WebServlet(name = "orederDetailServlet",urlPatterns = "/detail")
 public class OrederDetailServlet extends HttpServlet {
 
     OrderDetailBo detailBO= BoFactory.getBoFactory().getBO(BoFactory.BOTypes.Detail_BO);

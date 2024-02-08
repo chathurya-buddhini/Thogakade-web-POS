@@ -26,8 +26,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-@WebServlet(urlPatterns = "/items")
-//@WebServlet(name = "itemServlet",urlPatterns = "/items")
+//@WebServlet(urlPatterns = "/items")
+@WebServlet(name = "itemServlet",urlPatterns = "/items")
 public class ItemServlet extends HttpServlet {
 
     ItemBo itemBO= BoFactory.getBoFactory().getBO(BoFactory.BOTypes.ITEM);

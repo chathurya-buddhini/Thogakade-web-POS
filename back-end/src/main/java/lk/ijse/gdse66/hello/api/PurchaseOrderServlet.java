@@ -23,8 +23,8 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.List;
 
-@WebServlet(urlPatterns = "/orders")
-//@WebServlet(name = "purchaseOrderServlet",urlPatterns = "/orders")
+//@WebServlet(urlPatterns = "/orders")
+ @WebServlet(name = "purchaseOrderServlet",urlPatterns = "/orders")
 public class PurchaseOrderServlet extends HttpServlet {
 
     PurchaseOrderBo purchaseOrderBo= BoFactory.getBoFactory().getBO(BoFactory.BOTypes.PURCHASE_ORDER);
