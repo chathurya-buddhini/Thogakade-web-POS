@@ -1,7 +1,10 @@
+/////////customer//////////////////////////
+
 const CUS_ID_REGEX = /^(C00-)[0-9]{3}$/;
 const CUS_NAME_REGEX = /^[A-Za-z ]{5,}$/;
 const CUS_ADDRESS_REGEX = /^[A-Za-z0-9 ]{5,}$/;
 const CUS_SALARY_REGEX = /^[0-9]{2,}([.][0-9]{2})?$/;
+
 
 
 let c_vArray = new Array();
@@ -44,7 +47,7 @@ $("#customer-id,#customer-name,#customer-address,#customer-tp").on("keydown keyu
 
     setBtn();
 
-    //If the enter key pressed cheque and focus
+
     if (e.key == "Enter") {
 
         if (e.target.id != c_vArray[c_vArray.length - 1].field.attr("id")) {
@@ -187,7 +190,7 @@ $('#txtItemId,#txtItemdec,#txtItemUnitPrice,#txtItemQty').on("keydown keyup", fu
     if (e.key == "Enter") {
 
         if (e.target.id != i_validity[i_validity.length - 1].field.attr("id")) {
-            //check validation is ok
+
             if (checkItemValidations(i_validity[indexNo])) {
                 i_validity[indexNo + 1].field.focus();
             }
@@ -271,6 +274,8 @@ function checkAllItem() {
 
 $("#btnSaveItem").prop("disabled", true);
 $("#btnUpdateItem").prop("disabled", true);
+////////////////////////////Order/////////////////////////
+
 
 const orderId_regex =/^(ORD-)[0-9]{3}$/;
 

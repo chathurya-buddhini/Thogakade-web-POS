@@ -1,56 +1,133 @@
+
+let eventsBound2 = false;
+
 $('#btnUpdateItem').on('click',function (){
-    updateItem();
+    let idval = $(`#upItemId`).val();
+    searchItem(idval, function (exists) {
+        if (exists) {
+
+            updateItem();
+        } else {
+            clearUpdateTxt();
+            alert("Code doesnot exists. Please choose a existing Code.");
+        }
+    });
 });
 
 function updateItem(){
-    let id = $(`#upItemId`).val();
-    if (searchItem(id) == undefined) {
-        alert("No such Item..please check the ID");
-    } else {
-        let consent = confirm("Do you really want to update this item.?");
-        if (consent) {
-            let item = searchItem(id);
-            let description = $(`#upItemdesc`).val();
-            let unitPrice = $(`#upUnitPrice`).val();
-            let qty = $(`#upQty`).val();
+    let consent = confirm("Do you really want to update this item.?");
+    if (consent) {
+        let code = $(`#upItemId`).val();
+        let description = $(`#upItemdesc`).val();
+        let unitPrice = $(`#upUnitPrice`).val();
+        let qtyOnHand = $(`#upQty`).val();
 
-            item.description = description;
-            item.unitPrice = unitPrice;
-            item.qtyOnHand = qty;
+        const itemupdateObj = {
+            code:code,
+            description:description,
+            unitPrice:unitPrice,
+            qtyOnHand:qtyOnHand
+        };
 
-        }
+        const jsonitmupdate = JSON.stringify(itemupdateObj);
+
+        $.ajax({
+            url: "http://localhost:8080/app/items",
+            method: "PUT",
+            data: jsonitmupdate,
+            contentType: "application/json",
+            success: function (resp, textStatus, jqxhr) {
+                console.log("success: ", resp);
+                console.log("success: ", textStatus);
+                console.log("success: ", jqxhr);
+                getAllItem();
+            },
+            error: function (jqxhr, textStatus, error) {
+                console.log("error: ", jqxhr);
+                console.log("error: ", textStatus);
+                console.log("error: ", error);
+            }
+        })
+        clearUpdateTxt();
     }
-    getAllItem();
-    clearUpdateTxt();
+
 }
 
 $('#btnSaveItem').on('click', function () {
-    saveItem();
+    let id = $('#txtItemId').val();
+    searchItem(id, function (exists) {
+        if (exists) {
+            clearItemTxt();
+            alert("Code already exists. Please choose a different Code.");
+        } else {
+            saveItem();
+        }
+    });
 });
 
 function saveItem() {
-    let itemId = $('#txtItemId').val();
-    if (searchItem(itemId.trim()) === undefined) {
-        item = {
-            code: $('#txtItemId').val(),
-            description: $('#txtItemdec').val(),
-            qtyOnHand: $('#txtItemQty').val(),
-            unitPrice: $('#txtItemUnitPrice').val()
+
+    let code = $(`#txtItemId`).val();
+    let description = $(`#txtItemdec`).val();
+    let unitPrice = $(`#txtItemUnitPrice`).val();
+    let qty = $(`#txtItemQty`).val();
+
+    const itemObj = {
+        code: code,
+        description: description,
+        unitPrice: unitPrice,
+        qtyOnHand: qtyOnHand
+    };
+
+    const jsonitmObj = JSON.stringify(itemObj);
+
+    $.ajax({
+        url: "http://localhost:8080/app/items",
+        method: "POST",
+        data: jsonitmObj,
+        contentType: "application/json",
+        success: function (resp, textStatus, jqxhr) {
+            console.log("success: ", resp);
+            console.log("success: ", textStatus);
+            console.log("success: ", jqxhr);
+            getAllItem();
+            if (jqxhr.status == 201)
+                alert(jqxhr.responseText);
+
+        },
+        error: function (jqxhr, textStatus, error) {
+            console.log("error: ", jqxhr);
+            console.log("error: ", textStatus);
+            console.log("error: ", error);
         }
-        itemDB.push(item);
-        getAllItem();
-    } else {
-        alert('already exits Item id');
-    }
+    });
+
+
     clearItemTxt();
+
 }
 
-function searchItem(id) {
-    return itemDB.find(function (item) {
-        return item.code === id;
+function searchItem(id, callback) {
+    $.ajax({
+        url: "http://localhost:8080/app/items",
+        method: "GET",
+        success: function (resp) {
+            // ID exists
+            for (const item of resp) {
+                if(item.code == id) {
+                    callback(true);
+                    return;
+                }
+            }
+            callback(false);
+        },
+        error: function (jqxhr, textStatus, error) {
+            // ID does not exist
+            callback(false);
+            console.log("Error checking ID existence: ", jqxhr, textStatus, error);
+        }
     });
 }
-
 
 $('#btnGetAllItem').on('click', function () {
     getAllItem();
@@ -59,8 +136,18 @@ $('#btnGetAllItem').on('click', function () {
 function getAllItem() {
     $('#Item-body').empty();
 
-    for (const item of itemDB) {
-        $(`#Item-body`).append(`<tr>
+    $.ajax({
+        url : "http://localhost:8080/app/items",
+        method : "GET",
+        success : function (resp) {
+            console.log("Success: ", resp);
+            for (const item of resp) {
+                console.log(item.code);
+                console.log(item.description);
+                console.log(item.unitPrice);
+                console.log(item.qty);
+
+                $(`#Item-body`).append(`<tr>
                                 <td>${item.code}</td>
                                 <td>${item.description}</td>
                                 <td>${item.unitPrice}</td>
@@ -72,107 +159,113 @@ function getAllItem() {
                                 <button class="btn btn-danger me-3 btn-sm deleteItem">Delete</button></td>
                    
                              </tr>`);
-    }
-    setEvent();
-}
+                setEvent();
+            }
 
+        },
+        error : function (error) {
+            console.log("error: ", error);
+        }
+    })
+}
 
 function setEvent() {
 
-    $(`#tblItem tr`).click(function () {
+    if (!eventsBound2) {
+        $('#tblItem').on('click', 'tr', function () {
+            var $row = $(this).closest("tr"),
+                $tds = $row.find("td:nth-child(1)"),
+                $ts = $row.find("td:nth-child(2)"),
+                $tt = $row.find("td:nth-child(3)"),
+                $tf = $row.find("td:nth-child(4)");
 
-        var $row = $(this).closest("tr");
-        $tds = $row.find("td:nth-child(1)");
-        $ts = $row.find("td:nth-child(2)");
-        $tt = $row.find("td:nth-child(3)");
-        $tf = $row.find("td:nth-child(4)");
-        // let td_list =  $();
+            $(`#upItemId`).val($tds.text());
+            $(`#upItemdesc`).val($ts.text());
+            $(`#upUnitPrice`).val($tt.text());
+            $(`#upQty`).val($tf.text());
+        });
 
-        $(`#upItemId`).val($tds.text());
-        $(`#upItemdesc`).val($ts.text());
-        $(`#upUnitPrice`).val($tt.text());
-        $(`#upQty`).val($tf.text());
+        $('#tblItem').on('click', '.deleteItem', function (event) {
 
-    });
+            event.stopPropagation(); // Prevent click event from reaching tr elements
 
-    $('.deleteItem').click(function () {
-        console.log("delete");
-        $(`#tblItem tr`).click(function () {
+            var $row = $(this).closest("tr"),
+                $tds = $row.find("td:nth-child(1)");
 
-            var $row = $(this).closest("tr");
-            $tds = $row.find("td:nth-child(1)");
+            searchItem($tds.text(), function (exists) {
+                if (exists) {
+                    deleteItem($tds.text());
+                } else {
+                    alert("No such item..please check the code");
+                }
+            });
+        });
 
-            if (searchItem($tds.text()) === undefined) {
-                alert("No such Item..please check the ID");
-            } else {
-                if (deleteItem($tds.text())) {
-                    getAllItem();
-                    alert("Item Deleted !");
+        eventsBound2 = true;
+
+    }
+}
+
+setEvent();
+
+function deleteItem(code) {
+    $.ajax({
+        url: "http://localhost:8080/app/items?code=" + code,
+        method: "DELETE",
+        success: function (resp, textStatus, jqxhr) {
+            console.log("success: ", resp);
+            console.log("success: ", textStatus);
+            console.log("success: ", jqxhr);
+            getAllItem();
+        },
+        error: function (jqxhr, textStatus, error) {
+            console.log("error: ", jqxhr);
+            console.log("error: ", textStatus);
+            console.log("error: ", error);
+        }
+    })
+}
+
+$('#txtSearchItem').on('keyup', function () {
+    let txtitmVal = $('#txtSearchItem').val();
+
+    if (txtitmVal === '') {
+        getAllItem();
+        return;
+    }
+
+    $(`#Item-body`).empty();
+    const itmType = $("#itemSearch").val();
+
+    $.ajax({
+        url: "http://localhost:8080/app/items",
+        method: "GET",
+        success: function (resp) {
+            console.log("Success: ", resp);
+
+            for (const item of resp) {
+                const itmText = (itmType === "Code") ? item.code : item.description;
+
+                if (itmText.includes($("#txtSearchItem").val())) {
+                    const itmRow = `<tr>
+                        <td>${item.code}</td>
+                        <td>${item.description}</td>
+                        <td>${item.unitPrice}</td>
+                        <td>${item.qtyOnHand}</td>
+                        <td>
+                        <button type="button" class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#update-model">Edit</button>
+                        <button class="btn btn-danger me-3 btn-sm deleteItem">Delete</button></td>
+                    </tr>`;
+
+                    $("#tblItem > tbody").append($(`#Item-body`).append(itmRow));
+                    setEvent();
                 }
             }
-        });
+        },
+        error: function (error) {
+            console.log("error: ", error);
+        }
     });
-}
-
-function deleteItem(id) {
-    for (let i = 0; i < itemDB.length; i++) {
-        if (itemDB[i].code == id) {
-            itemDB.splice(i, 1);
-            return true
-        }
-    }
-    return false;
-}
-
-$('#txtSearchItem').on('keyup',function (){
-
-
-
-    let txtVal = $('#txtSearchItem');
-
-    if (txtVal.val() === ''){
-        getAllItem();
-    }
-    $(`#Item-body`).empty();
-
-    for (let item of itemDB) {
-        if ($("#itemSearch").val() === "Code") {
-            if (item.code.indexOf($("#txtSearchItem").val()) !== -1) {
-
-                $("#tblItem > tbody").append($(`#Item-body`).append(`<tr>
-                                <td>${item.code}</td>
-                                <td>${item.description}</td>
-                                <td>${item.unitPrice}</td>
-                                <td>${item.qtyOnHand}</td>
-                                <td><button type="button" class="btn btn-primary btn-sm me-2" data-bs-toggle="modal"
-                                        data-bs-target="#update-model">
-                                    Edit
-                                </button>
-                                <button class="btn btn-danger me-3 btn-sm delete">Delete</button></td>
-                   
-                             </tr>`));
-            }
-        } else {
-            if (item.description.indexOf($("#txtSearchItem").val()) !== -1) {
-
-                $("#tblItem > tbody").append($(`#Item-body`).append(`<tr>
-                                <td>${item.code}</td>
-                                <td>${item.description}</td>
-                                <td>${item.unitPrice}</td>
-                                <td>${item.qtyOnHand}</td>
-                                <td><button type="button" class="btn btn-primary btn-sm me-2" data-bs-toggle="modal"
-                                        data-bs-target="#update-model">
-                                    Edit
-                                </button>
-                                <button class="btn btn-danger me-3 btn-sm deleteItem">Delete</button></td>
-                   
-                             </tr>`));
-            }
-        }
-    }
-
-    setEvent();
 });
-
 
 getAllItem();

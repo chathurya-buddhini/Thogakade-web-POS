@@ -17,8 +17,6 @@ $('#btnClear').on('click', function () {
     clearBill();
 });
 
-//place order button
-
 $('#btnPlaceOrder').on('click', function () {
     let cash = parseFloat($('#txtCash').val());
     let balance = cash - final;
@@ -33,24 +31,49 @@ $('#btnPlaceOrder').on('click', function () {
     for (const tr of trList) {
         let child = $(tr).children();
         let object = {
-            oid: $('#txtOrderId').val(),
-            code: $(child[0]).text(),
+            orderId:$('#txtOrderId').val(),
+            itemCode: $(child[0]).text(),
             qty: $(child[3]).text(),
             unitPrice: $(child[2]).text()
         }
         itemList.push(object);
     }
 
-    orderDB.push({
-        oid: $("#txtOrderId").val(),
+    console.log(itemList);
+
+    let customerId = $('#selCusId').val();
+    console.log(customerId);
+    const orderObj = {
+        id: $("#txtOrderId").val(),
         date: $('#txtDate').val(),
-        customerID: $('#selCusId').val(),
-        orderDetails: itemList
+        customerId:customerId,
+        orderDetaisList: itemList
+    };
+
+    const jsonorderObj = JSON.stringify(orderObj);
+
+    $.ajax({
+        url: "http://localhost:8080/app/orders",
+        method: "POST",
+        data: jsonorderObj,
+        contentType: "application/json",
+        success: function (resp, textStatus, jqxhr) {
+            console.log("success: ", resp);
+            console.log("success: ", textStatus);
+            console.log("success: ", jqxhr);
+
+            if (jqxhr.status == 201)
+                alert(jqxhr.responseText);
+        },
+        error: function (jqxhr, textStatus, error) {
+            console.log("error: ", jqxhr);
+            console.log("error: ", textStatus);
+            console.log("error: ", error);
+        }
     });
 
     clearAll();
     $('#order-tbl-body').empty();
-    loadAllOrderDetails();
 
 });
 
@@ -97,44 +120,85 @@ $('#btnAddOrder').on('click', function () {
 });
 
 function loadCustomerId() {
-    for (const customer of customerDB) {
-        $('#selCusId').append(`<option>${customer.id}</option>`);
-    }
+    $.ajax({
+        url: "http://localhost:8080/app/customers",
+        method: "GET",
+        success: function (resp) {
+            console.log("Success: ", resp);
+            for (const customer of resp) {
+                $('#selCusId').append(`<option>${customer.id}</option>`)
+            }
+        },
+        error: function (error) {
+            console.log("Error: ", error);
+        }
+    });
 }
 
 $('#selCusId').on('change', function () {
     let id = $('#selCusId').val();
-    for (const customer of customerDB) {
-        if (customer.id == id) {
-            $('#orderCusName').val(customer.name);
-            $('#orderCusAddres').val(customer.address);
-            $('#orderCusTp').val(customer.tp);
+
+    $.ajax({
+        url: "http://localhost:8080/app/customers",
+        method: "GET",
+        success: function (resp) {
+            console.log("Success: ", resp);
+            for (const customer of resp) {
+                if (customer.id == id) {
+                    $('#orderCusName').val(customer.name);
+                    $('#orderCusAddres').val(customer.address);
+                }
+            }
+            $('#selItemId').focus();
+        },
+        error: function (error) {
+            console.log("Error: ", error);
         }
-    }
-    $('#selItemId').focus();
+    });
+
 });
 
-
 function loadAllItemId() {
-    for (const item of itemDB) {
-        $('#selItemId').append(`<option>${item.code}</option>`)
-    }
+
+    $.ajax({
+        url: "http://localhost:8080/app/items",
+        method: "GET",
+        success: function (resp) {
+            console.log("Success: ", resp);
+            for (const item of resp) {
+                $('#selItemId').append(`<option>${item.code}</option>`)
+            }
+        },
+        error: function (error) {
+            console.log("Error: ", error);
+        }
+    });
 }
 
 $('#selItemId').on('change', function () {
-    let id = $('#selItemId').val();
-    for (const item of itemDB) {
-        if (item.code == id) {
-            $('#orderItemDesc').val(item.description);
-            $('#orderItemPrice').val(item.unitPrice);
-            $('#orderQty').val(item.qtyOnHand);
+    let code = $('#selItemId').val();
+
+    $.ajax({
+        url: "http://localhost:8080/app/items",
+        method: "GET",
+        success: function (resp) {
+            console.log("Success: ", resp);
+            for (const item of resp) {
+                if (item.code == code) {
+                    $('#orderItemDesc').val(item.description);
+                    $('#orderItemPrice').val(item.unitPrice);
+                    $('#orderQty').val(item.qtyOnHand);
+                }
+            }
+            $('#getQty').focus();
+            $('#btnAddOrder').prop("disabled", false);
+        },
+        error: function (error) {
+            console.log("Error: ", error);
         }
-    }
-    $('#getQty').focus();
-
-    $('#btnAddOrder').prop("disabled", false);
-
+    });
 });
+
 
 $('#txtDiscount').on('keyup change', function () {
     let currentDiscount = parseFloat($('#txtDiscount').val());
