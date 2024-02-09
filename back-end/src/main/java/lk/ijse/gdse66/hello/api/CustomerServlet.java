@@ -8,28 +8,21 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.sql.*;
 import java.util.ArrayList;
 
-import jakarta.json.*;
+
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import lk.ijse.gdse66.hello.bo.BoFactory;
 import lk.ijse.gdse66.hello.bo.custom.CustomerBo;
 import lk.ijse.gdse66.hello.dto.CustomerDTO;
-import org.apache.commons.dbcp2.BasicDataSource;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 
-//@WebServlet(urlPatterns = "/customers")
- @WebServlet(name = "customerServlet",urlPatterns = "/customers")
+@WebServlet(urlPatterns = "/customers")
 public class CustomerServlet extends HttpServlet {
-
 
     CustomerBo customerBO= BoFactory.getBoFactory().getBO(BoFactory.BOTypes.CUSTOMER);
     private DataSource source;
@@ -44,10 +37,10 @@ public class CustomerServlet extends HttpServlet {
             throw new RuntimeException(e);
         }
     }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try {
-            Connection connection = source.getConnection();
+        try (Connection connection = source.getConnection();){
             ArrayList<CustomerDTO> allCustomers = customerBO.getAllCustomers(connection);
             resp.setContentType("application/json");
             Jsonb jsonb = JsonbBuilder.create();
@@ -55,7 +48,6 @@ public class CustomerServlet extends HttpServlet {
         } catch (SQLException | ClassNotFoundException throwables) {
             throwables.printStackTrace();
         }
-
     }
 
     @Override
@@ -68,24 +60,21 @@ public class CustomerServlet extends HttpServlet {
         double salary = customerDTO.getCusSalary();
 
 
-        if(id==null || !id.matches("C\\d{3}")){
+        if(id==null || !id.matches("^(C0)[0-9]{3}$")){
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID is empty or invalid");
             return;
-        } else if (name == null || !name.matches("[A-Za-z ]+")) {
+        } else if (name == null || !name.matches("^[A-Za-z ]{5,}$")) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Name is empty or invalid");
             return;
-        } else if (address == null || address.length() < 3) {
+        } else if (address == null) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Address is empty or invalid");
             return;
         }else if (salary < 0.0 ){
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Salary is empty or invalid");
             return;
         }
-        System.out.printf("id=%s, name=%s, address=%s,salary=%s \n", id,name,address,salary);
-System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaa");
-        try {
 
-            Connection connection = source.getConnection();
+        try( Connection connection = source.getConnection();) {
             boolean saveCustomer = customerBO.saveCustomer(new CustomerDTO(id,name,address,salary),connection);
             if (saveCustomer) {
                 resp.setStatus(HttpServletResponse.SC_CREATED);
@@ -93,7 +82,6 @@ System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaa");
             }else {
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to save the customer");
             }
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } catch (ClassNotFoundException e) {
@@ -113,10 +101,7 @@ System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaa");
         String address = customerDTO.getCusAddress();
         double salary = customerDTO.getCusSalary();
 
-        try {
-
-            Connection connection = source.getConnection();
-
+        try (Connection connection = source.getConnection();){
             boolean updateCustomer = customerBO.updateCustomer(new CustomerDTO(id, name, address, salary),connection);
             if (updateCustomer) {
                 resp.setStatus(HttpServletResponse.SC_CREATED);
@@ -137,8 +122,7 @@ System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaa");
 
         String id = req.getParameter("id");
 
-        try {
-            Connection connection = source.getConnection();
+        try (Connection connection = source.getConnection();){
             boolean deleteCustomer = customerBO.deleteCustomer(id,connection);
             if(deleteCustomer){
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -150,6 +134,5 @@ System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaa");
         }
 
     }
-
 
 }

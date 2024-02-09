@@ -7,7 +7,8 @@ public class CustomerDTO {
     private String cusAddress;
     private double cusSalary;
 
-
+    public CustomerDTO() {
+    }
 
     public CustomerDTO(String cusId, String cusName, String cusAddress, double cusSalary) {
         this.cusId = cusId;
@@ -50,7 +51,7 @@ public class CustomerDTO {
 
     @Override
     public String toString() {
-        return "Customer{" +
+        return "CustomerDTO{" +
                 "cusId='" + cusId + '\'' +
                 ", cusName='" + cusName + '\'' +
                 ", cusAddress='" + cusAddress + '\'' +

@@ -8,8 +8,8 @@
                         address VARCHAR (200),
                         salary DECIMAL (12.2),
                         CONSTRAINT PRIMARY KEY (id));
- INSERT INTO customer VALUES("C001","kamal samaranayaka","Galle",1000.00);
-  INSERT INTO customer VALUES("C002","samal samaranayaka","Mathara",1400.00);
+ INSERT INTO customer VALUES("C00-001","kamal samaranayaka","Galle",1000.00);
+  INSERT INTO customer VALUES("C00-002","samal samaranayaka","Mathara",1400.00);
 
    CREATE TABLE item( code VARCHAR(8)NOT NULL,
                         description VARCHAR (200),

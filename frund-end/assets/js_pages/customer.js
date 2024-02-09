@@ -1,6 +1,6 @@
 let tableBody = $("#body");
 
-
+// save the customer information
 $('#save-customer').click(function () {
     let id = $("#customer-gmail").val();
 
@@ -33,8 +33,7 @@ $('#save-customer').click(function () {
                     console.log("success: ", textStatus);
                     console.log("success: ", jqxhr);
 
-                    if (jqxhr.status == 201)
-                        alert(jqxhr.responseText);
+                    getAll();
                 },
                 error: function (jqxhr, textStatus, error) {
                     console.log("error: ", jqxhr);
@@ -43,43 +42,43 @@ $('#save-customer').click(function () {
                 }
             });
 
-            getAll();
+           
             clearCustomerInputFields();
         }
     });
 });
 
-
+// check if customer exists
 function isIdExists(id, callback) {
     $.ajax({
         url: "http://localhost:8080/app/customers",
         method: "GET",
         success: function (resp) {
-
-            for (const customer of resp) {
-                if(customer.id == id) {
-                    callback(true);
-                    return;
+            // ID exists
+                for (const customer of resp) {
+                    if(customer.id == id) {
+                        callback(true);
+                        return;
+                    }
                 }
-            }
-            callback(false);
+                callback(false);
         },
         error: function (jqxhr, textStatus, error) {
-
-            callback(false);
-            console.log("Error checking ID existence: ", jqxhr, textStatus, error);
+            // ID does not exist
+                callback(false);
+                console.log("Error checking ID existence: ", jqxhr, textStatus, error);
         }
     });
 }
 
-
+//update the customer information
 $('#updateCustomer').on('click', function () {
-
+    
     let idval = $(`#upCID`).val();
     isIdExists(idval, function (exists) {
         if (exists) {
-            // Continue with your existing code for updating the customer
-            updateCustomer();
+           // Continue with your existing code for updating the customer
+           updateCustomer();
         } else {
             clearCustomerInputFields();
             alert("ID doesnot exists. Please choose a existing ID.");
@@ -94,35 +93,35 @@ function updateCustomer() {
     let salary = $(`#upCTp`).val();
 
     const customerupdateObj = {
-        id:id,
-        name:name,
-        address:address,
-        salary:salary
+                id:id,
+                name:name,
+                address:address,
+                salary:salary
     };
-
+        
     const jsonObjupdate = JSON.stringify(customerupdateObj);
-
-    $.ajax({
-        url: "http://localhost:8080/app/customers",
-        method: "PUT",
-        data: jsonObjupdate,
-        contentType: "application/json",
-        success: function (resp, textStatus, jqxhr) {
-            console.log("success: ", resp);
-            console.log("success: ", textStatus);
-            console.log("success: ", jqxhr);
-            getAll();
-        },
-        error: function (jqxhr, textStatus, error) {
-            console.log("error: ", jqxhr);
-            console.log("error: ", textStatus);
-            console.log("error: ", error);
-        }
-    })
-    clearUpdateFiald();
+        
+            $.ajax({
+                url: "http://localhost:8080/app/customers",
+                method: "PUT",
+                data: jsonObjupdate,
+                contentType: "application/json",
+                success: function (resp, textStatus, jqxhr) {
+                    console.log("success: ", resp);
+                    console.log("success: ", textStatus);
+                    console.log("success: ", jqxhr);
+                    getAll();
+                },
+                error: function (jqxhr, textStatus, error) {
+                    console.log("error: ", jqxhr);
+                    console.log("error: ", textStatus);
+                    console.log("error: ", error);
+                }
+            })
+            clearUpdateFiald();
 }
 
-
+//get all customers
 $(`#getAllCustomer`).click(function () {
     getAll();
 });
@@ -163,12 +162,12 @@ function getAll() {
         }
     })
 
-
+    
 }
 
 let eventsBound = false;
 
-
+//Bind EDIT And Delete events
 function setEvent() {
     if (!eventsBound) {
         $('#tblCustomer').on('click', 'tr', function () {
@@ -205,7 +204,7 @@ function setEvent() {
 
 setEvent();
 
-
+//Delete Customer
 function deleteFunc(id){
     $.ajax({
         url: "http://localhost:8080/app/customers?id=" + id,
@@ -222,9 +221,9 @@ function deleteFunc(id){
             console.log("error: ", error);
         }
     })
-}
+}       
 
-
+//search for customers
 $('#txtSearch').on('keyup',function (){
 
     let txtVal = $('#txtSearch').val();

@@ -49,31 +49,3 @@ home.addEventListener("click",function(){
   odsec.style.display = 'none';
   oddsec.style.display = 'none';
 });
-
-let customer={
-id:"",
-name:"",
-address:"",
-tp:""
-}
-
-let item={
-code:"",
-description:"",
-qtyOnHand:0,
-unitPrice:0
-}
-
-let order = {
-oid:"",
-date:"",
-customerID:"",
-orderDetails:[]
-}
-
-let orderDetail = {
-oid: "",
-date: "",
-customerID: "",
-orderDetails: []
-}

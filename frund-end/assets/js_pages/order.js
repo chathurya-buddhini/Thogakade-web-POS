@@ -1,5 +1,5 @@
 let today = new Date().toISOString().slice(0, 10);
-
+//add css to date
 $('#txtDate').css({
     color: 'green',
     fontWeight: '500'
@@ -11,12 +11,13 @@ let finalTotal = 0;
 
 let final = 0;
 
-
+//clear all from the tables
 $('#btnClear').on('click', function () {
     clearAll();
     clearBill();
 });
 
+//place order button
 $('#btnPlaceOrder').on('click', function () {
     let cash = parseFloat($('#txtCash').val());
     let balance = cash - final;
@@ -61,9 +62,7 @@ $('#btnPlaceOrder').on('click', function () {
             console.log("success: ", resp);
             console.log("success: ", textStatus);
             console.log("success: ", jqxhr);
-
-            if (jqxhr.status == 201)
-                alert(jqxhr.responseText);
+            loadAllOrderDetails();
         },
         error: function (jqxhr, textStatus, error) {
             console.log("error: ", jqxhr);
@@ -72,11 +71,12 @@ $('#btnPlaceOrder').on('click', function () {
         }
     });
 
+    
     clearAll();
-    $('#order-tbl-body').empty();
-
+    $('#order-tbl-body').empty(); 
 });
 
+//add order to cart list
 $('#btnAddOrder').on('click', function () {
 
     let price = parseFloat($('#orderItemPrice').val());
@@ -119,6 +119,7 @@ $('#btnAddOrder').on('click', function () {
     $('#btnAddOrder').prop("disabled", true);
 });
 
+//get & load customer
 function loadCustomerId() {
     $.ajax({
         url: "http://localhost:8080/app/customers",
@@ -135,6 +136,7 @@ function loadCustomerId() {
     });
 }
 
+//set customer data
 $('#selCusId').on('change', function () {
     let id = $('#selCusId').val();
 
@@ -155,9 +157,10 @@ $('#selCusId').on('change', function () {
             console.log("Error: ", error);
         }
     });
-
+    
 });
 
+//get & load items
 function loadAllItemId() {
 
     $.ajax({
@@ -175,28 +178,29 @@ function loadAllItemId() {
     });
 }
 
+//set item data
 $('#selItemId').on('change', function () {
     let code = $('#selItemId').val();
 
-    $.ajax({
-        url: "http://localhost:8080/app/items",
-        method: "GET",
-        success: function (resp) {
-            console.log("Success: ", resp);
-            for (const item of resp) {
-                if (item.code == code) {
-                    $('#orderItemDesc').val(item.description);
-                    $('#orderItemPrice').val(item.unitPrice);
-                    $('#orderQty').val(item.qtyOnHand);
+        $.ajax({
+            url: "http://localhost:8080/app/items",
+            method: "GET",
+            success: function (resp) {
+                console.log("Success: ", resp);
+                for (const item of resp) {
+                    if (item.code == code) {
+                        $('#orderItemDesc').val(item.description);
+                        $('#orderItemPrice').val(item.unitPrice);
+                        $('#orderQty').val(item.qtyOnHand);
+                    }
                 }
+                $('#getQty').focus();
+                $('#btnAddOrder').prop("disabled", false);
+            },
+            error: function (error) {
+                console.log("Error: ", error);
             }
-            $('#getQty').focus();
-            $('#btnAddOrder').prop("disabled", false);
-        },
-        error: function (error) {
-            console.log("Error: ", error);
-        }
-    });
+        });
 });
 
 

@@ -1,14 +1,13 @@
-/////////customer//////////////////////////
+// Customer Validation
 
-const CUS_ID_REGEX = /^(C00-)[0-9]{3}$/;
+const CUS_ID_REGEX = /^(C0)[0-9]{3}$/;
 const CUS_NAME_REGEX = /^[A-Za-z ]{5,}$/;
 const CUS_ADDRESS_REGEX = /^[A-Za-z0-9 ]{5,}$/;
-const CUS_SALARY_REGEX = /^[0-9]{2,}([.][0-9]{2})?$/;
+const CUS_SALARY_REGEX = /^[1-9]\d*$/;
 
-
-
+//add validations and text fields to the
 let c_vArray = new Array();
-c_vArray.push({field: $("#customer-id"), regEx: CUS_ID_REGEX});
+c_vArray.push({field: $("#customer-gmail"), regEx: CUS_ID_REGEX});
 c_vArray.push({field: $("#customer-name"), regEx: CUS_NAME_REGEX});
 c_vArray.push({field: $("#customer-address"), regEx: CUS_ADDRESS_REGEX});
 c_vArray.push({field: $("#customer-tp"), regEx: CUS_SALARY_REGEX});
@@ -21,9 +20,9 @@ u_vArray.push({field: $("#upCAddress"), regEx: CUS_ADDRESS_REGEX});
 u_vArray.push({field: $("#upCTp"), regEx: CUS_SALARY_REGEX});
 
 function clearCustomerInputFields() {
-    $("#customer-id,#customer-name,#customer-address,#customer-tp").val("");
-    $("#customer-id,#customer-name,#customer-address,#customer-tp").css("border", "1px solid #ced4da");
-    $("#customer-id").focus();
+    $("#customer-gmail,#customer-name,#customer-address,#customer-tp").val("");
+    $("#customer-gmail,#customer-name,#customer-address,#customer-tp").css("border", "1px solid #ced4da");
+    $("#customer-gmail").focus();
 }
 
 function clearUpdateFiald(){
@@ -34,20 +33,22 @@ function clearUpdateFiald(){
 
 setBtn();
 
-$("#customer-id,#customer-name,#customer-address,#customer-tp").on("keydown keyup", function (e) {
-
+//disable tab
+$("#customer-gmail,#customer-name,#customer-address,#customer-tp").on("keydown keyup", function (e) {
+    //get the index number of data input fields indexNo
     let indexNo = c_vArray.indexOf(c_vArray.find((c) => c.field.attr("id") == e.target.id));
 
+    //Disable tab key
     if (e.key == "Tab") {
         e.preventDefault();
     }
 
-
+    //check validations
     checkValidations(c_vArray[indexNo]);
 
     setBtn();
 
-
+    //If the enter key pressed cheque and focus
     if (e.key == "Enter") {
 
         if (e.target.id != c_vArray[c_vArray.length - 1].field.attr("id")) {
@@ -65,17 +66,20 @@ $("#customer-id,#customer-name,#customer-address,#customer-tp").on("keydown keyu
 
 
 $("#upCID,#upCName,#upCAddress,#upCTp").on("keydown keyup", function (e) {
-
+    //get the index number of data input fields indexNo
     let indexNo = u_vArray.indexOf(u_vArray.find((c) => c.field.attr("id") == e.target.id));
 
+    //Disable tab key
     if (e.key == "Tab") {
         e.preventDefault();
     }
 
+    //check validations
     checkValidations(u_vArray[indexNo]);
 
     setBtn();
 
+    //If the enter key pressed cheque and focus
     if (e.key == "Enter") {
 
         if (e.target.id != u_vArray[u_vArray.length - 1].field.attr("id")) {
@@ -85,7 +89,7 @@ $("#upCID,#upCName,#upCAddress,#upCTp").on("keydown keyup", function (e) {
             }
         } else {
             if (checkValidations(u_vArray[indexNo])) {
-
+                // saveCustomer();
             }
         }
     }
@@ -126,6 +130,8 @@ function checkAll() {
 }
 
 function setBtn() {
+    // $(".delete").prop("disabled", true);
+    // $("#save-customer").prop("disabled", true);
 
     if (checkAll()) {
         $("#save-customer").prop("disabled", false);
@@ -134,19 +140,22 @@ function setBtn() {
     }
 
     let id = $("#upCID").val();
-    if (searchCustomer(id) == undefined) {
-
-        $("#updateCustomer").prop("disabled", true);
-    } else {
-
-        $("#updateCustomer").prop("disabled", false);
-    }
+    isIdExists(id, function (exists) {
+        if(!exists) {
+            $("#updateCustomer").prop("disabled", true);
+        } else{
+            $("#updateCustomer").prop("disabled", false);
+        }
+    });
 
 }
-////////////////////////////////item//////////////////////////////////////////////////
-const item_id_regx = /^(I00-)[0-9]{3}$/;
+
+//------------------------------------------------------------------------------------------------------------------------
+//Items Validation
+
+const item_id_regx = /^(P0)[0-9]{3}$/;
 const description_regx = /^[A-Za-z ]{5,}$/;
-const price_regex = /^[0-9]{2,}([.][0-9]{2})?$/;
+const price_regex = /^[0-9 ]{2,}$/;
 const qty_regex = /^[0-9 ]{2,}$/;
 
 let i_validity = [];
@@ -175,57 +184,60 @@ function clearUpdateTxt(){
 }
 
 $('#txtItemId,#txtItemdec,#txtItemUnitPrice,#txtItemQty').on("keydown keyup", function (e) {
-
+    //get the index number of data input fields indexNo
     let indexNo = i_validity.indexOf(i_validity.find((c) => c.field.attr("id") == e.target.id));
 
+    //Disable tab key
     if (e.key == "Tab") {
         e.preventDefault();
     }
 
-
+    //check validations
     checkValidations(i_validity[indexNo]);
 
     setItemBtn();
 
+    //If the enter key pressed cheque and focus
     if (e.key == "Enter") {
 
         if (e.target.id != i_validity[i_validity.length - 1].field.attr("id")) {
-
+            //check validation is ok
             if (checkItemValidations(i_validity[indexNo])) {
                 i_validity[indexNo + 1].field.focus();
             }
         } else {
             if (checkItemValidations(i_validity[indexNo])) {
-
+                // saveCustomer();
             }
         }
     }
 });
 
 $('#upItemId,#upItemdesc,#upUnitPrice,#upQty').on("keydown keyup", function (e) {
-
+    //get the index number of data input fields indexNo
     let indexNo = update_validity.indexOf(update_validity.find((c) => c.field.attr("id") == e.target.id));
 
-
+    //Disable tab key
     if (e.key == "Tab") {
         e.preventDefault();
     }
 
-
+    //check validations
     checkValidations(update_validity[indexNo]);
 
     setItemBtn();
 
+    //If the enter key pressed cheque and focus
     if (e.key == "Enter") {
 
         if (e.target.id != update_validity[update_validity.length - 1].field.attr("id")) {
-
+            //check validation is ok
             if (checkItemValidations(update_validity[indexNo])) {
                 update_validity[indexNo + 1].field.focus();
             }
         } else {
             if (checkItemValidations(update_validity[indexNo])) {
-
+                // saveCustomer();
             }
         }
     }
@@ -251,17 +263,12 @@ function setItemBtn() {
 
     let id = $("#upItemId").val();
 
-    if (searchItemValid(id) == undefined) {
-        $("#btnUpdateItem").prop("disabled", true);
-    } else {
-        $("#btnUpdateItem").prop("disabled", false);
-    }
-
-}
-
-function searchItemValid(id) {
-    return itemDB.find(function (item) {
-        return item.code == id;
+    searchItem(id, function (exists) {
+        if(!exists) {
+            $("#btnUpdateItem").prop("disabled", true);
+        } else{
+            $("#btnUpdateItem").prop("disabled", false);
+        }
     });
 }
 
@@ -274,10 +281,10 @@ function checkAllItem() {
 
 $("#btnSaveItem").prop("disabled", true);
 $("#btnUpdateItem").prop("disabled", true);
-////////////////////////////Order/////////////////////////
+//-------------`------------------------------------------------------------------------------------------------
+//Order validations
 
-
-const orderId_regex =/^(ORD-)[0-9]{3}$/;
+const orderId_regex =/^(OR)[0-9]{3}$/;
 
 $('#btnAddOrder').prop("disabled", true);
 
@@ -306,6 +313,7 @@ function clearAll() {
     finalTotal = 0;
     final = 0;
     $('#btnAddOrder').prop("disabled", true);
+    $('#selCusId').prop('disabled',true);
 }
 
 function clearBill(){

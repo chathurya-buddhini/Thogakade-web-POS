@@ -5,10 +5,9 @@ import jakarta.json.*;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import lk.ijse.gdse66.hello.bo.BoFactory;
-import lk.ijse.gdse66.hello.bo.custom.CustomerBo;
 import lk.ijse.gdse66.hello.bo.custom.ItemBo;
 import lk.ijse.gdse66.hello.dto.ItemDTO;
-import org.apache.commons.dbcp2.BasicDataSource;
+
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -27,7 +26,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 //@WebServlet(urlPatterns = "/items")
-@WebServlet(name = "itemServlet",urlPatterns = "/items")
+@WebServlet(urlPatterns = "/items")
 public class ItemServlet extends HttpServlet {
 
     ItemBo itemBO= BoFactory.getBoFactory().getBO(BoFactory.BOTypes.ITEM);
@@ -140,4 +139,10 @@ public class ItemServlet extends HttpServlet {
         }
     }
 
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.addHeader("Access-Control-Allow-Origin", "*");
+        resp.addHeader("Access-Control-Allow-Methods", "DELETE,PUT,GET");
+        resp.addHeader("Access-Control-Allow-Headers", "Content-Type");
+    }
     }

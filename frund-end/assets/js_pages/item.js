@@ -1,12 +1,10 @@
-
-let eventsBound2 = false;
-
+//update the items
 $('#btnUpdateItem').on('click',function (){
     let idval = $(`#upItemId`).val();
     searchItem(idval, function (exists) {
         if (exists) {
-
-            updateItem();
+           // Continue with your existing code for updating the items
+           updateItem();
         } else {
             clearUpdateTxt();
             alert("Code doesnot exists. Please choose a existing Code.");
@@ -15,44 +13,45 @@ $('#btnUpdateItem').on('click',function (){
 });
 
 function updateItem(){
-    let consent = confirm("Do you really want to update this item.?");
-    if (consent) {
-        let code = $(`#upItemId`).val();
-        let description = $(`#upItemdesc`).val();
-        let unitPrice = $(`#upUnitPrice`).val();
-        let qtyOnHand = $(`#upQty`).val();
+        let consent = confirm("Do you really want to update this item.?");
+        if (consent) {
+            let code = $(`#upItemId`).val();
+            let description = $(`#upItemdesc`).val();
+            let unitPrice = $(`#upUnitPrice`).val();
+            let qtyOnHand = $(`#upQty`).val();
 
-        const itemupdateObj = {
-            code:code,
-            description:description,
-            unitPrice:unitPrice,
-            qtyOnHand:qtyOnHand
-        };
+            const itemupdateObj = {
+                code:code,
+                description:description,
+                unitPrice:unitPrice,
+                qtyOnHand:qtyOnHand
+    };
 
-        const jsonitmupdate = JSON.stringify(itemupdateObj);
-
-        $.ajax({
-            url: "http://localhost:8080/app/items",
-            method: "PUT",
-            data: jsonitmupdate,
-            contentType: "application/json",
-            success: function (resp, textStatus, jqxhr) {
-                console.log("success: ", resp);
-                console.log("success: ", textStatus);
-                console.log("success: ", jqxhr);
-                getAllItem();
-            },
-            error: function (jqxhr, textStatus, error) {
-                console.log("error: ", jqxhr);
-                console.log("error: ", textStatus);
-                console.log("error: ", error);
-            }
-        })
+    const jsonitmupdate = JSON.stringify(itemupdateObj);
+        
+    $.ajax({
+        url: "http://localhost:8080/app/items",
+        method: "PUT",
+        data: jsonitmupdate,
+        contentType: "application/json",
+        success: function (resp, textStatus, jqxhr) {
+            console.log("success: ", resp);
+            console.log("success: ", textStatus);
+            console.log("success: ", jqxhr);
+            getAllItem();
+        },
+        error: function (jqxhr, textStatus, error) {
+            console.log("error: ", jqxhr);
+            console.log("error: ", textStatus);
+            console.log("error: ", error);
+        }
+    })
         clearUpdateTxt();
     }
-
+    
 }
 
+//save the item
 $('#btnSaveItem').on('click', function () {
     let id = $('#txtItemId').val();
     searchItem(id, function (exists) {
@@ -66,69 +65,71 @@ $('#btnSaveItem').on('click', function () {
 });
 
 function saveItem() {
-
+    
     let code = $(`#txtItemId`).val();
     let description = $(`#txtItemdec`).val();
     let unitPrice = $(`#txtItemUnitPrice`).val();
-    let qty = $(`#txtItemQty`).val();
+    let qtyOnHand = $(`#txtItemQty`).val();
 
-    const itemObj = {
-        code: code,
-        description: description,
-        unitPrice: unitPrice,
-        qtyOnHand: qtyOnHand
-    };
+            const itemObj = {
+                code: code,
+                description: description,
+                unitPrice: unitPrice,
+                qtyOnHand: qtyOnHand
+            };
 
-    const jsonitmObj = JSON.stringify(itemObj);
+            const jsonitmObj = JSON.stringify(itemObj);
 
-    $.ajax({
-        url: "http://localhost:8080/app/items",
-        method: "POST",
-        data: jsonitmObj,
-        contentType: "application/json",
-        success: function (resp, textStatus, jqxhr) {
-            console.log("success: ", resp);
-            console.log("success: ", textStatus);
-            console.log("success: ", jqxhr);
-            getAllItem();
-            if (jqxhr.status == 201)
-                alert(jqxhr.responseText);
+            $.ajax({
+                url: "http://localhost:8080/app/items",
+                method: "POST",
+                data: jsonitmObj,
+                contentType: "application/json",
+                success: function (resp, textStatus, jqxhr) {
+                    console.log("success: ", resp);
+                    console.log("success: ", textStatus);
+                    console.log("success: ", jqxhr);
+                    getAllItem();
+                    if (jqxhr.status == 201)
+                        alert(jqxhr.responseText);
+                        
+                },
+                error: function (jqxhr, textStatus, error) {
+                    console.log("error: ", jqxhr);
+                    console.log("error: ", textStatus);
+                    console.log("error: ", error);
+                }
+            });
 
-        },
-        error: function (jqxhr, textStatus, error) {
-            console.log("error: ", jqxhr);
-            console.log("error: ", textStatus);
-            console.log("error: ", error);
-        }
-    });
-
-
-    clearItemTxt();
+          
+            clearItemTxt();
 
 }
 
+//search for items
 function searchItem(id, callback) {
     $.ajax({
         url: "http://localhost:8080/app/items",
         method: "GET",
         success: function (resp) {
             // ID exists
-            for (const item of resp) {
-                if(item.code == id) {
-                    callback(true);
-                    return;
+                for (const item of resp) {
+                    if(item.code == id) {
+                        callback(true);
+                        return;
+                    }
                 }
-            }
-            callback(false);
+                callback(false);
         },
         error: function (jqxhr, textStatus, error) {
             // ID does not exist
-            callback(false);
-            console.log("Error checking ID existence: ", jqxhr, textStatus, error);
+                callback(false);
+                console.log("Error checking ID existence: ", jqxhr, textStatus, error);
         }
     });
 }
 
+//get the item
 $('#btnGetAllItem').on('click', function () {
     getAllItem();
 });
@@ -147,7 +148,7 @@ function getAllItem() {
                 console.log(item.unitPrice);
                 console.log(item.qty);
 
-                $(`#Item-body`).append(`<tr>
+               $(`#Item-body`).append(`<tr>
                                 <td>${item.code}</td>
                                 <td>${item.description}</td>
                                 <td>${item.unitPrice}</td>
@@ -169,6 +170,9 @@ function getAllItem() {
     })
 }
 
+let eventsBound2 = false;
+
+//Bind EDIT And Delete events
 function setEvent() {
 
     if (!eventsBound2) {
@@ -179,10 +183,10 @@ function setEvent() {
                 $tt = $row.find("td:nth-child(3)"),
                 $tf = $row.find("td:nth-child(4)");
 
-            $(`#upItemId`).val($tds.text());
-            $(`#upItemdesc`).val($ts.text());
-            $(`#upUnitPrice`).val($tt.text());
-            $(`#upQty`).val($tf.text());
+                $(`#upItemId`).val($tds.text());
+                $(`#upItemdesc`).val($ts.text());
+                $(`#upUnitPrice`).val($tt.text());
+                $(`#upQty`).val($tf.text());
         });
 
         $('#tblItem').on('click', '.deleteItem', function (event) {
@@ -208,6 +212,7 @@ function setEvent() {
 
 setEvent();
 
+//delete item
 function deleteItem(code) {
     $.ajax({
         url: "http://localhost:8080/app/items?code=" + code,
@@ -226,6 +231,8 @@ function deleteItem(code) {
     })
 }
 
+
+//search for items
 $('#txtSearchItem').on('keyup', function () {
     let txtitmVal = $('#txtSearchItem').val();
 

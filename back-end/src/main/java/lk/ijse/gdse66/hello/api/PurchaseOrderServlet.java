@@ -24,7 +24,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 //@WebServlet(urlPatterns = "/orders")
- @WebServlet(name = "purchaseOrderServlet",urlPatterns = "/orders")
+@WebServlet(name = "purchaseOrderServlet",urlPatterns = "/orders")
 public class PurchaseOrderServlet extends HttpServlet {
 
     PurchaseOrderBo purchaseOrderBo= BoFactory.getBoFactory().getBO(BoFactory.BOTypes.PURCHASE_ORDER);
@@ -82,6 +82,12 @@ public class PurchaseOrderServlet extends HttpServlet {
         }
     }
 
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.addHeader("Access-Control-Allow-Origin", "*");
+        resp.addHeader("Access-Control-Allow-Methods", "DELETE,PUT,GET");
+        resp.addHeader("Access-Control-Allow-Headers", "Content-Type");
+    }
 }
 
 
