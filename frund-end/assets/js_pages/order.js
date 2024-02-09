@@ -32,7 +32,7 @@ $('#btnPlaceOrder').on('click', function () {
     for (const tr of trList) {
         let child = $(tr).children();
         let object = {
-            orderId:$('#txtOrderId').val(),
+            orderID:$('#txtOrderId').val(),
             itemCode: $(child[0]).text(),
             qty: $(child[3]).text(),
             unitPrice: $(child[2]).text()
