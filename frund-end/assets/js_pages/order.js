@@ -42,13 +42,13 @@ $('#btnPlaceOrder').on('click', function () {
 
     console.log(itemList);
 
-    let customerId = $('#selCusId').val();
-    console.log(customerId);
+    let customerID = $('#selCusId').val();
+    console.log(customerID);
     const orderObj = {
-        id: $("#txtOrderId").val(),
+        orderID: $("#txtOrderId").val(),
         date: $('#txtDate').val(),
-        customerId:customerId,
-        orderDetaisList: itemList
+        customerID:customerID,
+        orderDetailsDTOList: itemList
     };
 
     const jsonorderObj = JSON.stringify(orderObj);
@@ -127,7 +127,7 @@ function loadCustomerId() {
         success: function (resp) {
             console.log("Success: ", resp);
             for (const customer of resp) {
-                $('#selCusId').append(`<option>${customer.id}</option>`)
+                $('#selCusId').append(`<option>${customer.cusId}</option>`)
             }
         },
         error: function (error) {
@@ -138,7 +138,7 @@ function loadCustomerId() {
 
 
 $('#selCusId').on('change', function () {
-    let id = $('#selCusId').val();
+    let cusId = $('#selCusId').val();
 
     $.ajax({
         url: "http://localhost:8080/app/customers",
@@ -146,9 +146,9 @@ $('#selCusId').on('change', function () {
         success: function (resp) {
             console.log("Success: ", resp);
             for (const customer of resp) {
-                if (customer.id == id) {
-                    $('#orderCusName').val(customer.name);
-                    $('#orderCusAddres').val(customer.address);
+                if (customer.cusId == cusId) {
+                    $('#orderCusName').val(customer.cusName);
+                    $('#orderCusAddres').val(customer.cusAddress);
                 }
             }
             $('#selItemId').focus();
@@ -169,7 +169,7 @@ function loadAllItemId() {
         success: function (resp) {
             console.log("Success: ", resp);
             for (const item of resp) {
-                $('#selItemId').append(`<option>${item.code}</option>`)
+                $('#selItemId').append(`<option>${item.ItemCode}</option>`)
             }
         },
         error: function (error) {
@@ -179,28 +179,29 @@ function loadAllItemId() {
 }
 
 
+//set item data
 $('#selItemId').on('change', function () {
-    let code = $('#selItemId').val();
+    let ItemCode = $('#selItemId').val();
 
-        $.ajax({
-            url: "http://localhost:8080/app/items",
-            method: "GET",
-            success: function (resp) {
-                console.log("Success: ", resp);
-                for (const item of resp) {
-                    if (item.code == code) {
-                        $('#orderItemDesc').val(item.description);
-                        $('#orderItemPrice').val(item.unitPrice);
-                        $('#orderQty').val(item.qtyOnHand);
-                    }
+    $.ajax({
+        url: "http://localhost:8080/app/items",
+        method: "GET",
+        success: function (resp) {
+            console.log("Success: ", resp);
+            for (const item of resp) {
+                if (item.ItemCode == ItemCode) {
+                    $('#orderItemDesc').val(item.ItemName);
+                    $('#orderItemPrice').val(item.ItemPrice);
+                    $('#orderQty').val(item.ItemQty);
                 }
-                $('#getQty').focus();
-                $('#btnAddOrder').prop("disabled", false);
-            },
-            error: function (error) {
-                console.log("Error: ", error);
             }
-        });
+            $('#getQty').focus();
+            $('#btnAddOrder').prop("disabled", false);
+        },
+        error: function (error) {
+            console.log("Error: ", error);
+        }
+    });
 });
 
 
