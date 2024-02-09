@@ -283,7 +283,7 @@ $("#btnSaveItem").prop("disabled", true);
 $("#btnUpdateItem").prop("disabled", true);
 //-------------`------------------------------------------------------------------------------------------------
 //Order validations
-/*
+
 const orderId_regex =/^(OR)[0-9]{3}$/;
 
 $('#btnAddOrder').prop("disabled", true);
@@ -320,4 +320,4 @@ function clearBill(){
     $('#txtBalnce ,#txtCash ,#txtDiscount').val('');
     $('#total ,#subTotal').text('00.0');
     $('#btnAddOrder').prop("disabled", true);
-}*/
+}

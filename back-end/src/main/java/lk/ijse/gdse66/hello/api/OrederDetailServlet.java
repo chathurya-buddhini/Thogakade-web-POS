@@ -3,7 +3,6 @@ package lk.ijse.gdse66.hello.api;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import lk.ijse.gdse66.hello.bo.BoFactory;
-import lk.ijse.gdse66.hello.bo.custom.ItemBo;
 import lk.ijse.gdse66.hello.bo.custom.OrderDetailBo;
 import lk.ijse.gdse66.hello.dto.OrderDetailDTO;
 
@@ -20,8 +19,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-//@WebServlet(urlPatterns = "/detail")
-  @WebServlet(name = "orederDetailServlet",urlPatterns = "/detail")
+@WebServlet(urlPatterns = "/detail")
 public class OrederDetailServlet extends HttpServlet {
 
     OrderDetailBo detailBO= BoFactory.getBoFactory().getBO(BoFactory.BOTypes.Detail_BO);
@@ -38,21 +36,13 @@ public class OrederDetailServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try {
-            Connection connection = source.getConnection();
+        try (Connection connection = source.getConnection();) {
             ArrayList<OrderDetailDTO> alldetails = detailBO.getAllDetails(connection);
             resp.setContentType("application/json");
             Jsonb jsonb = JsonbBuilder.create();
-            jsonb.toJson(alldetails,resp.getWriter());
+            jsonb.toJson(alldetails, resp.getWriter());
         } catch (SQLException | ClassNotFoundException throwables) {
             throwables.printStackTrace();
         }
-    }
-
-    @Override
-    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.addHeader("Access-Control-Allow-Origin", "*");
-        resp.addHeader("Access-Control-Allow-Methods", "DELETE,PUT,GET");
-        resp.addHeader("Access-Control-Allow-Headers", "Content-Type");
     }
 }

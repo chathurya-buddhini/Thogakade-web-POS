@@ -9,7 +9,7 @@ function loadAllOrderDetails(){
                 console.log("Success: ", resp);
                 for (const detail of resp) {
                     $(`#order-detail-body`).append(`<tr>
-                    <td>${detail.orderId}</td>
+                    <td>${detail.orderID}</td>
                     <td>${detail.itemCode}</td>
                     <td>${detail.qty}</td>
                     <td>${detail.unitPrice}</td>
