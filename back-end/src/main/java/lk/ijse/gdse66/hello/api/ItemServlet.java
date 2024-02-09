@@ -1,7 +1,5 @@
 package lk.ijse.gdse66.hello.api;
 
-import jakarta.json.*;
-
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import lk.ijse.gdse66.hello.bo.BoFactory;
@@ -11,7 +9,6 @@ import lk.ijse.gdse66.hello.dto.ItemDTO;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -19,13 +16,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-//@WebServlet(urlPatterns = "/items")
 @WebServlet(urlPatterns = "/items")
 public class ItemServlet extends HttpServlet {
 
@@ -45,8 +39,8 @@ public class ItemServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        try {
-            ArrayList<ItemDTO> allitems = itemBO.getAllItems(source.getConnection());
+        try (Connection connection = source.getConnection();){
+            ArrayList<ItemDTO> allitems = itemBO.getAllItems(connection);
             resp.setContentType("application/json");
             Jsonb jsonb = JsonbBuilder.create();
             jsonb.toJson(allitems,resp.getWriter());
@@ -66,10 +60,10 @@ public class ItemServlet extends HttpServlet {
         int qty = itemDTO.getItemQty();
 
 
-        if(code==null || !code.matches("I\\d{3}")){
+        if(code==null || !code.matches("^(P0)[0-9]{3}$")){
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Item Code is empty or invalid");
             return;
-        } else if (description == null || !description.matches("[A-Za-z ]+")) {
+        } else if (description == null || !description.matches("^[A-Za-z ]{5,}$")) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Description is empty or invalid");
             return;
         } else if (unitPrice < 0.0) {
@@ -80,9 +74,9 @@ public class ItemServlet extends HttpServlet {
             return;
         }
 
-        try {
+        try (Connection connection = source.getConnection();){
 
-            boolean saveItem = itemBO.saveItem(new ItemDTO(code,description,unitPrice,qty), source.getConnection());
+            boolean saveItem = itemBO.saveItem(new ItemDTO(code,description,unitPrice,qty), connection);
             if (saveItem) {
                 resp.setStatus(HttpServletResponse.SC_CREATED);
                 resp.getWriter().write("Added item successfully");
@@ -106,9 +100,9 @@ public class ItemServlet extends HttpServlet {
         double unitPrice = itemDTO.getItemPrice();
         int qty = itemDTO.getItemQty();
 
-        try {
+        try (Connection connection = source.getConnection();) {
 
-            boolean updateItem = itemBO.updateItem(new ItemDTO(code,description,unitPrice,qty), source.getConnection());
+            boolean updateItem = itemBO.updateItem(new ItemDTO(code,description,unitPrice,qty), connection);
             if (updateItem) {
                 resp.setStatus(HttpServletResponse.SC_CREATED);
                 resp.getWriter().write("Updated item successfully");
@@ -125,10 +119,10 @@ public class ItemServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String id = req.getParameter("id");
+        String id = req.getParameter("itemCode");
 
-        try {
-            boolean deleteItem = itemBO.deleteItem(id, source.getConnection());
+        try (Connection connection = source.getConnection();){
+            boolean deleteItem = itemBO.deleteItem(id, connection);
             if (deleteItem) {
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
             } else {
@@ -137,12 +131,5 @@ public class ItemServlet extends HttpServlet {
         } catch (SQLException | ClassNotFoundException throwables) {
             throwables.printStackTrace();
         }
-    }
-
-    @Override
-    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.addHeader("Access-Control-Allow-Origin", "*");
-        resp.addHeader("Access-Control-Allow-Methods", "DELETE,PUT,GET");
-        resp.addHeader("Access-Control-Allow-Headers", "Content-Type");
     }
     }

@@ -14,6 +14,9 @@ public class ItemDTO {
         ItemQty = itemQty;
     }
 
+    public ItemDTO() {
+    }
+
     public String getItemCode() {
         return ItemCode;
     }

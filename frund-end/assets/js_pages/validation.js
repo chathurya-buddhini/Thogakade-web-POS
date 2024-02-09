@@ -152,7 +152,6 @@ function setBtn() {
 
 //------------------------------------------------------------------------------------------------------------------------
 //Items Validation
-/*
 
 const item_id_regx = /^(P0)[0-9]{3}$/;
 const description_regx = /^[A-Za-z ]{5,}$/;
@@ -186,7 +185,7 @@ function clearUpdateTxt(){
 
 $('#txtItemId,#txtItemdec,#txtItemUnitPrice,#txtItemQty').on("keydown keyup", function (e) {
     //get the index number of data input fields indexNo
-    let indexNo = i_validity.indexOf(i_validity.find((c) => c.field.attr("id") == e.target.id));
+    let indexNo = i_validity.indexOf(i_validity.find((c) => c.field.attr("id") === e.target.id));
 
     //Disable tab key
     if (e.key == "Tab") {
@@ -216,10 +215,10 @@ $('#txtItemId,#txtItemdec,#txtItemUnitPrice,#txtItemQty').on("keydown keyup", fu
 
 $('#upItemId,#upItemdesc,#upUnitPrice,#upQty').on("keydown keyup", function (e) {
     //get the index number of data input fields indexNo
-    let indexNo = update_validity.indexOf(update_validity.find((c) => c.field.attr("id") == e.target.id));
+    let indexNo = update_validity.indexOf(update_validity.find((c) => c.field.attr("id") === e.target.id));
 
     //Disable tab key
-    if (e.key == "Tab") {
+    if (e.key === "Tab") {
         e.preventDefault();
     }
 
@@ -229,7 +228,7 @@ $('#upItemId,#upItemdesc,#upUnitPrice,#upQty').on("keydown keyup", function (e) 
     setItemBtn();
 
     //If the enter key pressed cheque and focus
-    if (e.key == "Enter") {
+    if (e.key === "Enter") {
 
         if (e.target.id != update_validity[update_validity.length - 1].field.attr("id")) {
             //check validation is ok
@@ -284,7 +283,7 @@ $("#btnSaveItem").prop("disabled", true);
 $("#btnUpdateItem").prop("disabled", true);
 //-------------`------------------------------------------------------------------------------------------------
 //Order validations
-
+/*
 const orderId_regex =/^(OR)[0-9]{3}$/;
 
 $('#btnAddOrder').prop("disabled", true);

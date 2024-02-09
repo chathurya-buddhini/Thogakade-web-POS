@@ -22,10 +22,11 @@ function updateItem(){
             let qtyOnHand = $(`#upQty`).val();
 
             const itemupdateObj = {
-                code:code,
-                description:description,
-                unitPrice:unitPrice,
-                qtyOnHand:qtyOnHand
+
+                    itemCode: code,
+                    itemName: description,
+                    itemPrice: unitPrice,
+                    itemQty: qtyOnHand
     };
 
     const jsonitmupdate = JSON.stringify(itemupdateObj);
@@ -73,10 +74,10 @@ function saveItem() {
     let qtyOnHand = $(`#txtItemQty`).val();
 
             const itemObj = {
-                code: code,
-                description: description,
-                unitPrice: unitPrice,
-                qtyOnHand: qtyOnHand
+                itemCode: code,
+                itemName: description,
+                itemPrice: unitPrice,
+                itemQty: qtyOnHand
             };
 
             const jsonitmObj = JSON.stringify(itemObj);
@@ -115,7 +116,7 @@ function searchItem(id, callback) {
         success: function (resp) {
 
                 for (const item of resp) {
-                    if(item.code == id) {
+                    if(item.itemCode == id) {
                         callback(true);
                         return;
                     }
@@ -144,16 +145,16 @@ function getAllItem() {
         success : function (resp) {
             console.log("Success: ", resp);
             for (const item of resp) {
-                console.log(item.code);
-                console.log(item.description);
-                console.log(item.unitPrice);
-                console.log(item.qty);
+                console.log(item.itemCode);
+                console.log(item.itemName);
+                console.log(item.itemPrice);
+                console.log(item.itemQty);
 
                $(`#Item-body`).append(`<tr>
-                                <td>${item.code}</td>
-                                <td>${item.description}</td>
-                                <td>${item.unitPrice}</td>
-                                <td>${item.qtyOnHand}</td>
+                                <td>${item.itemCode}</td>
+                                <td>${item.itemName}</td>
+                                <td>${item.itemPrice}</td>
+                                <td>${item.itemQty}</td>
                                 <td><button type="button" class="btn btn-primary btn-sm me-2" data-bs-toggle="modal"
                                         data-bs-target="#update-model">
                                     Edit
@@ -216,7 +217,7 @@ setEvent();
 
 function deleteItem(code) {
     $.ajax({
-        url: "http://localhost:8080/app/items?code=" + code,
+        url: "http://localhost:8080/app/items?itemCode=" + code,
         method: "DELETE",
         success: function (resp, textStatus, jqxhr) {
             console.log("success: ", resp);
@@ -252,14 +253,14 @@ $('#txtSearchItem').on('keyup', function () {
             console.log("Success: ", resp);
 
             for (const item of resp) {
-                const itmText = (itmType === "Code") ? item.code : item.description;
+                const itmText = (itmType === "Code") ? item.itemCode : item.itemName;
 
                 if (itmText.includes($("#txtSearchItem").val())) {
                     const itmRow = `<tr>
-                        <td>${item.code}</td>
-                        <td>${item.description}</td>
-                        <td>${item.unitPrice}</td>
-                        <td>${item.qtyOnHand}</td>
+                        <td>${item.itemCode}</td>
+                        <td>${item.itemName}</td>
+                        <td>${item.itemPrice}</td>
+                        <td>${item.itemQty}</td>
                         <td>
                         <button type="button" class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#update-model">Edit</button>
                         <button class="btn btn-danger me-3 btn-sm deleteItem">Delete</button></td>
