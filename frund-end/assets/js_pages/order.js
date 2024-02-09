@@ -1,5 +1,5 @@
 let today = new Date().toISOString().slice(0, 10);
-//add css to date
+
 $('#txtDate').css({
     color: 'green',
     fontWeight: '500'
@@ -11,13 +11,13 @@ let finalTotal = 0;
 
 let final = 0;
 
-//clear all from the tables
+
 $('#btnClear').on('click', function () {
     clearAll();
     clearBill();
 });
 
-//place order button
+
 $('#btnPlaceOrder').on('click', function () {
     let cash = parseFloat($('#txtCash').val());
     let balance = cash - final;
@@ -76,7 +76,7 @@ $('#btnPlaceOrder').on('click', function () {
     $('#order-tbl-body').empty(); 
 });
 
-//add order to cart list
+
 $('#btnAddOrder').on('click', function () {
 
     let price = parseFloat($('#orderItemPrice').val());
@@ -119,7 +119,7 @@ $('#btnAddOrder').on('click', function () {
     $('#btnAddOrder').prop("disabled", true);
 });
 
-//get & load customer
+
 function loadCustomerId() {
     $.ajax({
         url: "http://localhost:8080/app/customers",
@@ -136,7 +136,7 @@ function loadCustomerId() {
     });
 }
 
-//set customer data
+
 $('#selCusId').on('change', function () {
     let id = $('#selCusId').val();
 
@@ -160,7 +160,7 @@ $('#selCusId').on('change', function () {
     
 });
 
-//get & load items
+
 function loadAllItemId() {
 
     $.ajax({
@@ -178,7 +178,7 @@ function loadAllItemId() {
     });
 }
 
-//set item data
+
 $('#selItemId').on('change', function () {
     let code = $('#selItemId').val();
 

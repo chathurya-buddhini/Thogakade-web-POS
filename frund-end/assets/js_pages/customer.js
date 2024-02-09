@@ -1,24 +1,24 @@
 let tableBody = $("#body");
 
-// save the customer information
+
 $('#save-customer').click(function () {
-    let id = $("#customer-gmail").val();
+    let id = $("#customer-id").val();
 
     isIdExists(id, function (exists) {
         if (exists) {
             clearCustomerInputFields();
             alert("ID already exists. Please choose a different ID.");
         } else {
-            // Continue with your existing code for saving the customer
+
             let name = $("#customer-name").val();
             let address = $("#customer-address").val();
             let salary = $("#customer-tp").val();
 
             const customerObj = {
-                id: id,
-                name: name,
-                address: address,
-                salary: salary
+                cusId: id,
+                cusName: name,
+                cusAddress: address,
+                cusSalary: salary
             };
 
             const jsonObj = JSON.stringify(customerObj);
@@ -41,14 +41,12 @@ $('#save-customer').click(function () {
                     console.log("error: ", error);
                 }
             });
-
-           
             clearCustomerInputFields();
         }
     });
 });
 
-// check if customer exists
+
 function isIdExists(id, callback) {
     $.ajax({
         url: "http://localhost:8080/app/customers",
@@ -56,7 +54,7 @@ function isIdExists(id, callback) {
         success: function (resp) {
             // ID exists
                 for (const customer of resp) {
-                    if(customer.id == id) {
+                    if(customer.cusId == id) {
                         callback(true);
                         return;
                     }
@@ -64,20 +62,19 @@ function isIdExists(id, callback) {
                 callback(false);
         },
         error: function (jqxhr, textStatus, error) {
-            // ID does not exist
+
                 callback(false);
                 console.log("Error checking ID existence: ", jqxhr, textStatus, error);
         }
     });
 }
 
-//update the customer information
+
 $('#updateCustomer').on('click', function () {
     
     let idval = $(`#upCID`).val();
     isIdExists(idval, function (exists) {
         if (exists) {
-           // Continue with your existing code for updating the customer
            updateCustomer();
         } else {
             clearCustomerInputFields();
@@ -93,10 +90,10 @@ function updateCustomer() {
     let salary = $(`#upCTp`).val();
 
     const customerupdateObj = {
-                id:id,
-                name:name,
-                address:address,
-                salary:salary
+                cusId:id,
+                cusName:name,
+                cusAddress:address,
+                cusSalary:salary
     };
         
     const jsonObjupdate = JSON.stringify(customerupdateObj);
@@ -121,7 +118,7 @@ function updateCustomer() {
             clearUpdateFiald();
 }
 
-//get all customers
+
 $(`#getAllCustomer`).click(function () {
     getAll();
 });
@@ -136,16 +133,16 @@ function getAll() {
         success : function (resp) {
             console.log("Success: ", resp);
             for (const customer of resp) {
-                console.log(customer.id);
-                console.log(customer.name);
-                console.log(customer.address);
-                console.log(customer.salary);
+                console.log(customer.cusId);
+                console.log(customer.cusName);
+                console.log(customer.cusAddress);
+                console.log(customer.cusSalary);
 
                 $(`#body`).append(`<tr>
-                                <td>${customer.id}</td>
-                                <td>${customer.name}</td>
-                                <td>${customer.address}</td>
-                                <td>${customer.salary}</td>
+                                <td>${customer.cusId}</td>
+                                <td>${customer.cusName}</td>
+                                <td>${customer.cusAddress}</td>
+                                <td>${customer.cusSalary}</td>
                                 <td><button type="button" class="btn btn-primary btn-sm me-2" data-bs-toggle="modal"
                                         data-bs-target="#exampleModal2">
                                     Edit
@@ -167,7 +164,7 @@ function getAll() {
 
 let eventsBound = false;
 
-//Bind EDIT And Delete events
+
 function setEvent() {
     if (!eventsBound) {
         $('#tblCustomer').on('click', 'tr', function () {
@@ -184,7 +181,7 @@ function setEvent() {
         });
 
         $('#tblCustomer').on('click', '.delete', function (event) {
-            event.stopPropagation(); // Prevent click event from reaching tr elements
+            event.stopPropagation();
 
             var $row = $(this).closest("tr"),
                 $tds = $row.find("td:nth-child(1)");
@@ -204,7 +201,7 @@ function setEvent() {
 
 setEvent();
 
-//Delete Customer
+
 function deleteFunc(id){
     $.ajax({
         url: "http://localhost:8080/app/customers?id=" + id,
@@ -223,7 +220,7 @@ function deleteFunc(id){
     })
 }       
 
-//search for customers
+
 $('#txtSearch').on('keyup',function (){
 
     let txtVal = $('#txtSearch').val();
@@ -243,14 +240,14 @@ $('#txtSearch').on('keyup',function (){
             console.log("Success: ", resp);
 
             for (const customer of resp) {
-                const searchText = (searchType === "Customer Id") ? customer.id : customer.name;
+                const searchText = (searchType === "Customer Id") ? customer.cusId: customer.cusName;
 
                 if (searchText.includes($("#txtSearch").val())) {
                     const customerRow = `<tr>
-                        <td>${customer.id}</td>
-                        <td>${customer.name}</td>
-                        <td>${customer.address}</td>
-                        <td>${customer.salary}</td>
+                        <td>${customer.cusId}</td>
+                        <td>${customer.cusName}</td>
+                        <td>${customer.cusAddress}</td>
+                        <td>${customer.cusSalary}</td>
                         <td>
                             <button type="button" class="btn btn-primary btn-sm me-2" data-bs-toggle="modal"
                                 data-bs-target="#exampleModal2">Edit

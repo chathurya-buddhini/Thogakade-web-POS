@@ -1,9 +1,10 @@
-//update the items
+
+
 $('#btnUpdateItem').on('click',function (){
     let idval = $(`#upItemId`).val();
     searchItem(idval, function (exists) {
         if (exists) {
-           // Continue with your existing code for updating the items
+
            updateItem();
         } else {
             clearUpdateTxt();
@@ -51,7 +52,7 @@ function updateItem(){
     
 }
 
-//save the item
+
 $('#btnSaveItem').on('click', function () {
     let id = $('#txtItemId').val();
     searchItem(id, function (exists) {
@@ -106,13 +107,13 @@ function saveItem() {
 
 }
 
-//search for items
+
 function searchItem(id, callback) {
     $.ajax({
         url: "http://localhost:8080/app/items",
         method: "GET",
         success: function (resp) {
-            // ID exists
+
                 for (const item of resp) {
                     if(item.code == id) {
                         callback(true);
@@ -129,7 +130,7 @@ function searchItem(id, callback) {
     });
 }
 
-//get the item
+
 $('#btnGetAllItem').on('click', function () {
     getAllItem();
 });
@@ -172,7 +173,7 @@ function getAllItem() {
 
 let eventsBound2 = false;
 
-//Bind EDIT And Delete events
+
 function setEvent() {
 
     if (!eventsBound2) {
@@ -212,7 +213,7 @@ function setEvent() {
 
 setEvent();
 
-//delete item
+
 function deleteItem(code) {
     $.ajax({
         url: "http://localhost:8080/app/items?code=" + code,
@@ -232,7 +233,7 @@ function deleteItem(code) {
 }
 
 
-//search for items
+
 $('#txtSearchItem').on('keyup', function () {
     let txtitmVal = $('#txtSearchItem').val();
 

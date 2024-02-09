@@ -7,7 +7,7 @@ const CUS_SALARY_REGEX = /^[1-9]\d*$/;
 
 //add validations and text fields to the
 let c_vArray = new Array();
-c_vArray.push({field: $("#customer-gmail"), regEx: CUS_ID_REGEX});
+c_vArray.push({field: $("#customer-id"), regEx: CUS_ID_REGEX});
 c_vArray.push({field: $("#customer-name"), regEx: CUS_NAME_REGEX});
 c_vArray.push({field: $("#customer-address"), regEx: CUS_ADDRESS_REGEX});
 c_vArray.push({field: $("#customer-tp"), regEx: CUS_SALARY_REGEX});
@@ -20,9 +20,9 @@ u_vArray.push({field: $("#upCAddress"), regEx: CUS_ADDRESS_REGEX});
 u_vArray.push({field: $("#upCTp"), regEx: CUS_SALARY_REGEX});
 
 function clearCustomerInputFields() {
-    $("#customer-gmail,#customer-name,#customer-address,#customer-tp").val("");
-    $("#customer-gmail,#customer-name,#customer-address,#customer-tp").css("border", "1px solid #ced4da");
-    $("#customer-gmail").focus();
+    $("#customer-id,#customer-name,#customer-address,#customer-tp").val("");
+    $("#customer-id,#customer-name,#customer-address,#customer-tp").css("border", "1px solid #ced4da");
+    $("#customer-id").focus();
 }
 
 function clearUpdateFiald(){
@@ -34,7 +34,7 @@ function clearUpdateFiald(){
 setBtn();
 
 //disable tab
-$("#customer-gmail,#customer-name,#customer-address,#customer-tp").on("keydown keyup", function (e) {
+$("#customer-id,#customer-name,#customer-address,#customer-tp").on("keydown keyup", function (e) {
     //get the index number of data input fields indexNo
     let indexNo = c_vArray.indexOf(c_vArray.find((c) => c.field.attr("id") == e.target.id));
 
@@ -152,6 +152,7 @@ function setBtn() {
 
 //------------------------------------------------------------------------------------------------------------------------
 //Items Validation
+/*
 
 const item_id_regx = /^(P0)[0-9]{3}$/;
 const description_regx = /^[A-Za-z ]{5,}$/;
@@ -320,4 +321,4 @@ function clearBill(){
     $('#txtBalnce ,#txtCash ,#txtDiscount').val('');
     $('#total ,#subTotal').text('00.0');
     $('#btnAddOrder').prop("disabled", true);
-}
+}*/
